@@ -26,7 +26,7 @@ var conecccion =mysql.createConnection({
     host:'localhost',
     user:'root',
     password:'doris',
-    database:'AMPBDP'
+    database:'app'
 });
 //se lanza la coneccion o inicia la coneccion con el servidor
 conecccion.connect(function(error){
