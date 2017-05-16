@@ -207,7 +207,7 @@ router.post('/darDeBajaConversacion', function(solicitud, respuesta, next) {
             if(error){
               console.log(error);
             }else{
-              var darDeBajaMensaje=db.query('UPDATE Mensaje SET borrado_Logico=? WHERE id_Conversacion=?', [solicitud.body.id_Usuario,solicitud.body.id_Conversacion],function(error,res,filas){
+              var darDeBajaMensaje=db.query('UPDATE Mensaje SET borrado_Logico=? WHERE id_Conversacion=? and borrado_Logico!=?', [solicitud.body.id_Usuario,solicitud.body.id_Conversacion,-1],function(error,res,filas){
                 if(error){
                   console.log(error);
                 }else{
@@ -222,7 +222,7 @@ router.post('/darDeBajaConversacion', function(solicitud, respuesta, next) {
               if(error){
                 console.log(error);
               }else{
-                var darDeBajaMensaje=db.query('UPDATE Mensaje SET borrado_Logico=? WHERE id_Conversacion=?', [-1,solicitud.body.id_Conversacion],function(error,res,filas){
+                var darDeBajaMensaje=db.query('UPDATE Mensaje SET borrado_Logico=? WHERE id_Conversacion=? and borrado_Logico!=?', [-1,solicitud.body.id_Conversacion,-1],function(error,res,filas){
                   if(error){
                     console.log(error);
                   }else{

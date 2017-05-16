@@ -3,7 +3,8 @@ module.exports=function(db){//Importar y exportar módulos a node
 //Framewor que utiliza node
 var express = require('express'),
 //inposta el modulo para trabajar con rutas o direccciones
-path=require("path");
+path=require("path"),
+nodemailer=require("nodemailer");
 //
 var router = express.Router();
 var mysql=require('mysql');//(importar)para acceder a la libreria de mysql desde node
@@ -32,11 +33,13 @@ router.post('/iniciarsession', function(solicitud, respuesta, next) {
 //*****************Mostrar Usuario**************//
 //Recibe el id del usuario para hacer una consulta a la base de datos y devuelva los datos del usuario para que sean presentados en la aplicación
 router.post('/mostrarUsuario', function(solicitud, respuesta, next) { 
-  var mostrarUsuario=db.query("SELECT *FROM Usuario WHERE id_Usuario=?",[solicitud.body.idIdentificacion],function(error,columnas,filas){
+  var mostrarUsuario=db.query("SELECT *FROM Usuario WHERE id_Usuario=?",[solicitud.body.idIdentificacion],function(error,resBD,filas){
     if(error){
       console.log(error);
-    }else{      
-      respuesta.json(columnas);   //terminar la peticion 
+    }else{ 
+      var f=resBD[0].foto;      
+      resBD[0].foto=f.toString(); 
+      respuesta.json(resBD);   //terminar la peticion 
     }  
  
   })
@@ -69,7 +72,7 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
       if (resBD=="") {
         cont=1;
         datos[0]=cont;
-        var crearUsuario=db.query('INSERT INTO Usuario(cedula,nombres,apellidos,contrasena,fecha_Nacimiento,email,celular,link_Facebook,borrado_Logico,calificacion_Total) VALUES(?,?,?,?,?,?,?,?,?,?)', [solicitud.body.cedula,solicitud.body.nombres,solicitud.body.apellidos,solicitud.body.contrasena,fecha,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook, 0,0],function(error,res){
+        var crearUsuario=db.query('INSERT INTO Usuario(cedula,nombres,apellidos,contrasena,fecha_Nacimiento,email,celular,link_Facebook,borrado_Logico,calificacion_Total,foto,rol) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', [solicitud.body.cedula,solicitud.body.nombres,solicitud.body.apellidos,solicitud.body.contrasena,fecha,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook, 0,0,solicitud.body.foto,solicitud.body.rol],function(error,res){
           if(error){
             console.log(error);
           }else{           
@@ -91,12 +94,13 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
 //Se recibe los datos contraseña, email, celular, link_Facebook y id_Usuario de la aplicación 
 //Con el del id_Usuario se verifica cual es la cuenta que hay que modificar una vez seleccionada la cuenta 
 //se modificara la cuenta con los siguiente datos contraseña, email, celular, link_Facebook 
-router.put('/modificarUsuario', function(solicitud, respuesta, next) {
-  var modificarUsuario=db.query('UPDATE Usuario SET contrasena=?,email=?,celular=?,link_Facebook=? WHERE id_Usuario=?', [solicitud.body.contrasena,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook,solicitud.body.id_Usuario],function(error,columnas,filas){
+router.put('/modificarUsuario', function(solicitud, respuesta, next) {  
+  console.log(solicitud.body);
+  var modificarUsuario=db.query('UPDATE Usuario SET contrasena=?,email=?,celular=?,link_Facebook=?,foto=? WHERE id_Usuario=?', [solicitud.body.contrasena,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook,solicitud.body.foto,solicitud.body.id_Usuario],function(error,resBD,filas){
     if(error){
       console.log(error);
   }else{
-      respuesta.json(columnas);
+      respuesta.json(resBD);
   } 
   })
 });
@@ -108,11 +112,10 @@ router.put('/modificarUsuario', function(solicitud, respuesta, next) {
 //En caso de no existir un registro de calificacion se inserta uno para que se el usuario dueño de la cuenta pueda calificar el anuncio del usuario que lo emitio
 //Finalmente envia un gmail (con la informacion email, celular, link_Facebook) al usuario que se puso en contacto con el usuario que emitio el anuncio 
 router.post('/verUsuario', function(solicitud, respuesta, next) { 
-  var verUsuario=db.query("SELECT *from Usuario, Publicacion WHERE Publicacion.id_Publicacion=? and Publicacion.id_Usuario=Usuario.id_Usuario",[solicitud.body.id_Publicacion],function(error,resBD,filas){
+  var verUsuario=db.query("SELECT Usuario.nombres,Usuario.apellidos,Usuario.cedula,Usuario.foto,Usuario.email,Usuario.celular,Usuario.link_Facebook,Usuario.id_Usuario from Usuario, Publicacion WHERE Publicacion.id_Publicacion=? and Publicacion.id_Usuario=Usuario.id_Usuario",[solicitud.body.id_Publicacion],function(error,resBD,filas){
     if(error){
       console.log(error); 
     }else{ 
-      
       var verUsu=db.query("SELECT email from Usuario WHERE id_Usuario=?",[solicitud.body.id_UsuarioC],function(error,resBD2,filas){
         if(error){
           console.log(error); 
@@ -161,8 +164,10 @@ router.post('/verUsuario', function(solicitud, respuesta, next) {
               console.log("Email enviado con exito");
             }
           });
-        }else{
         }
+        var f=resBD[0].foto;      
+        resBD[0].foto=f.toString(); 
+        
         respuesta.json(resBD);   //terminar la peticion 
 
         }
@@ -222,11 +227,15 @@ router.post('/enviarInfoUsuario',function(solicitud,respuesta){
 //*******************************Selecionar emil, nombres y apellidos de Usuario*****************************************//
 //Realiza la consulta para devolver a la aplicacion los datos (email,nombres,apellidos) de un usuario tomando en cuenta el id_Usuario enviado por la aplicaicon
 router.post('/obtenerInfoUser', function(solicitud, respuesta, next) { 
-  var obtenerInfoUser=db.query("SELECT email,nombres,apellidos FROM Usuario WHERE id_Usuario=?",[solicitud.body.idIdentificacion],function(error,columnas,filas){
+  var obtenerInfoUser=db.query("SELECT email,nombres,apellidos,foto FROM Usuario WHERE id_Usuario=?",[solicitud.body.idIdentificacion],function(error,resBD,filas){
     if(error){
       console.log(error);
-    }else{      
-      respuesta.json(columnas);   //terminar la peticion 
+    }else{ 
+  //terminar la peticion 
+             var f=resBD[0].foto;      
+        resBD[0].foto=f.toString(); 
+
+      respuesta.json(resBD);   //terminar la peticion 
     }  
   })
 });
