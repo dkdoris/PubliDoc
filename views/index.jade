@@ -1,0 +1,16 @@
+extends layout
+block content
+	articule(id="login")
+		div()
+			div(class="panel-heading")
+				h2 Iniciar Sesion
+				p #{msj}
+			div(class="panel-body")
+				form(method="post" action="admin")
+					div.form-group
+						label Usuario
+						input.form-control(id="usuario"  name="usuario" type='text' placeholder='Ingrese su Usuario' title="Usuario Requerido" required )
+					div.form-group
+						label Contrasena
+						input.form-control(id="contrasena" name='contrasena' type="password" placeholder="Ingrese su Contrasena" title="Contrasena Requerida" required)
+					input(id="btn_entrar" type='submit' value="Entrar" class="btn btn-primary btn-block")

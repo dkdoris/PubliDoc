@@ -1,0 +1,28 @@
+extends layout_admin
+block content
+	include nav	
+	articule(id="principal")
+		div(class="panel panel-default")
+			div(class="panel-heading")
+				h3 Lista de Usuarios
+			div(class="panel-body")
+						table(id="tabla_usuarios" class="display" cellspacing="0" width="100%")
+							thead
+								tr
+									th Nombres
+									th Apellidos
+									th Cedula
+									th Correo
+									th Estado		
+									th Opciones
+							each usuario in list_usuarios
+								tr(class="obtener_usuario")
+									td #{usuario.nombres}
+									td #{usuario.apellidos}
+									td #{usuario.cedula}								
+									td #{usuario.email}
+									td #{usuario.borrado_Logico}
+									td										
+										button( name="btn_ActDes" type="submit" id="#{usuario.id_Usuario}") Act/Des
+										button(name="btn_restaurar_contrasena" id="#{usuario.id_Usuario}" type="submit") Restaurar Contrasena
+										button(name="btn_eliminar_usuario" id="#{usuario.id_Usuario}" type="submit") Eliminar
