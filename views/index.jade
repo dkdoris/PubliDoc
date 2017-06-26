@@ -1,16 +1,16 @@
 extends layout
 block content
-	articule(id="login")
-		div()
-			div(class="panel-heading")
-				h2 Iniciar Sesion
-				p #{msj}
-			div(class="panel-body")
-				form(method="post" action="admin")
-					div.form-group
-						label Usuario
-						input.form-control(id="usuario"  name="usuario" type='text' placeholder='Ingrese su Usuario' title="Usuario Requerido" required )
-					div.form-group
-						label Contrasena
-						input.form-control(id="contrasena" name='contrasena' type="password" placeholder="Ingrese su Contrasena" title="Contrasena Requerida" required)
-					input(id="btn_entrar" type='submit' value="Entrar" class="btn btn-primary btn-block")
+	include nav_login
+		h2(id="container") Iniciar Sesion
+			p #{msj}
+		div(id="container")
+			form(method="post" action="admin")
+				div(class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label")
+					label(class="mdl-textfield__label" for="usuario") Usuario	
+					input(class="mdl-textfield__input" id="usuario"  name="usuario" type='text'  title="Usuario Requerido" required )
+				br
+				div(class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label")
+					label(class="mdl-textfield__label" for="contrasena" ) Contrasena
+					input(class="mdl-textfield__input" id="contrasena" name='contrasena' type="password"  title="Contrasena Requerida" required)
+				br
+				input(id="btn_entrar" type='submit' value="Entrar" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent")

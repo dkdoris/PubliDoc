@@ -23,7 +23,8 @@ $('[name=btn_restaurar_contrasena]').on('click',function(e){
 			method: "PUT",
 			data:{id:id}
 		})
-		.done(function(doc){			
+		.done(function(doc){
+			alert(doc);			
 			location.reload();
 		});        
 	});
@@ -37,7 +38,8 @@ $('[name=btn_eliminar_usuario]').on('click',function(e){
 			method: "DELETE",
 			data:{id:id}
 		})
-		.done(function(doc){			
+		.done(function(doc){
+			alert(doc);			
 			location.reload();
 		});        
 	});

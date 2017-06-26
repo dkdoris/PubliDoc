@@ -9,7 +9,7 @@ var logger = require('morgan');
 var mysql=require('mysql');//(importar)para acceder a la libreria de mysql desde node
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var session = require('express-session');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 //llamando a al archivo
@@ -56,6 +56,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
 //ruteo es el cambio de URL
 app.use('/', routes);
 app.use('/users', users);

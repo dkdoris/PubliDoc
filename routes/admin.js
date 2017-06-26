@@ -6,26 +6,25 @@ var router = express.Router();
     router.post('/', function(solicitud, respuesta, next) {  
       var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=? and rol='admin'",[solicitud.body.usuario,solicitud.body.contrasena],function(error,consulta){
       if(error){
-        console.log(error);
-       respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error en la consulta' });	
+        console.log(error);      
+       respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error en la consulta' });  
     }else{
       //devuelve la respuesta json el servidor
       console.log(consulta.length);
+      solicitud.session.nombre=consulta[0].nombres+" "+consulta[0].apellidos;
+      solicitud.session._id=consulta[0].id_Usuario;                   
       if(consulta.length>0){
              var iniciarsession=db.query("SELECT *FROM Usuario WHERE rol!='admin'",function(error,usuarios){
                   if(error){
                     console.log(error);                  
-                  }else{
-                    if(usuarios.length>0){                      
-                      respuesta.render('admin_principal',{nombre_usuario:"Administrador",list_usuarios:usuarios});
-                    }else{
-                      respuesta.render('admin_principal',{nombre_usuario:"Administrador",list_usuarios:usuarios});
-                    }                                      
+                  }else{                                        
+                    respuesta.render('admin_principal',{nombre_usuario:solicitud.session.nombre,list_usuarios:usuarios});                    
+                      //respuesta.render('admin_principal',{nombre_usuario:"Administrador",list_usuarios:usuarios});                                                          
                   }
 
               })
       }else{
-       respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Usuario o contraseña incorrectos' });	
+       respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Usuario o contraseña incorrectos' });  
       }             
     } 
    })      
@@ -52,16 +51,16 @@ router.put('/restaurar_contrasena', function(solicitud, respuesta, next) {
      }
   })
   /*
-	if(solicitud.session.nombre){
+  if(solicitud.session.nombre){
 
-	}else{
-		respuesta.redirect('/');
-	}
+  }else{
+    respuesta.redirect('/');
+  }
   */
 });
 
 router.put('/estado_usuario', function(solicitud, respuesta, next) {
-	 var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
+   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
      if(error){
        console.log(error);                  
      }else{
@@ -86,13 +85,19 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
 });
  
 router.delete('/eliminar_usuario', function(solicitud, respuesta, next) {
-	 var consulta=db.query("DELETE FROM Usuario WHERE id_Usuario=?",[solicitud.body.id],function(error,resBD){
+   var consulta=db.query("DELETE FROM Usuario WHERE id_Usuario=?",[solicitud.body.id],function(error,resBD){
      if(error){
        console.log(error);                  
      }else{
-        console.log("Usuario eliminado correctamente");
+       respuesta.send("Usuario eliminado correctamente");
      }
   })
+});
+
+router.get('/cerrar_session', function(req, res, next) {
+  delete  req.session.nombre;
+  delete  req.session.id;
+  res.redirect(200,'../');
 });
 
 return router;

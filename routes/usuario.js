@@ -95,7 +95,7 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
 //Con el del id_Usuario se verifica cual es la cuenta que hay que modificar una vez seleccionada la cuenta 
 //se modificara la cuenta con los siguiente datos contraseña, email, celular, link_Facebook 
 router.put('/modificarUsuario', function(solicitud, respuesta, next) {  
-  //Busca si existe si el correo ingresado es el mismo
+  //Busca si existe el correo ingresado es el mismo
   var buscarEmail=db.query('SELECT email FROM Usuario WHERE id_Usuario=? and email=?', [solicitud.body.id_Usuario,solicitud.body.email],function(error,resBD){
     if(error){
         console.log(error);
@@ -116,7 +116,7 @@ router.put('/modificarUsuario', function(solicitud, respuesta, next) {
               if(error){
                 console.log(error);
               }else{  
-                //El email no se encontro en la base de datos si resBD1 es igual a "" caso contrario no el email pertenece a otra cuenta
+                //El email no se encontro en la base de datos si resBD1 es igual a "" caso contrario el email pertenece a otra cuenta
                 if(resBD1=="") {
                   var modificarUsuario=db.query('UPDATE Usuario SET contrasena=?,email=?,celular=?,link_Facebook=?,foto=? WHERE id_Usuario=?', [solicitud.body.contrasena,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook,solicitud.body.foto,solicitud.body.id_Usuario],function(error,resBD3,filas){
                     if(error){

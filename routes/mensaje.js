@@ -37,7 +37,7 @@ console.log("Se conecto el socket");
 //En caso de que inicio_Conversacion sea igual a id_Usuario se realiza una consulta para actualizar inicio_Conversacion a cero y saber que se leyo la conversacion nueva
   router.post('/mostrarMensajes', function(solicitud, respuesta, next) {
     if(solicitud.body.id_Conversacion>0){
-    var mostrarMensajes=db.query("SELECT contenido,nombres,apellidos,tipo_Mensaje from Mensaje,Usuario where Mensaje.id_Conversacion=? and  Mensaje.id_UsuarioE=Usuario.id_Usuario and (Mensaje.borrado_Logico!=? and Mensaje.borrado_Logico!=?) order by id_Mensaje",[solicitud.body.id_Conversacion,-1,solicitud.body.id_Usuario],function(error,resBD,filas){
+    var mostrarMensajes=db.query("SELECT contenido,nombres,apellidos,tipo_Mensaje,foto,id_Usuario from Mensaje,Usuario where Mensaje.id_Conversacion=? and  Mensaje.id_UsuarioE=Usuario.id_Usuario and (Mensaje.borrado_Logico!=? and Mensaje.borrado_Logico!=?) order by id_Mensaje",[solicitud.body.id_Conversacion,-1,solicitud.body.id_Usuario],function(error,resBD,filas){
       if(error){
         console.log(error);
       }else{ 
@@ -58,7 +58,12 @@ console.log("Se conecto el socket");
             }       
           })
         }
-
+        //Transforma en string el resultado de la foto enviado de la consulta pues esta guardada en codigo 64
+        var f;
+        for (var i = 0; i < resBD.length; i++) {
+          f=resBD[i].foto;      
+          resBD[i].foto=f.toString();
+        };
         respuesta.json(resBD);   //terminar la peticion 
       }  
        
@@ -70,10 +75,16 @@ console.log("Se conecto el socket");
 //********************Mostrar lista de mensajes***********************//
 //Realiza una consulta para seleccionar la lista de mensajes a ser mostrados
 router.post('/listaMensajes', function(solicitud, respuesta, next) {
-    var listaMensajes=db.query("SELECT u.id_Usuario,c.id_Conversacion,u.nombres,u.apellidos FROM Conversacion c, Usuario u WHERE CASE WHEN c.id_Usuario1 = ? THEN c.id_Usuario2 = u.id_Usuario WHEN c.id_Usuario2 = ? THEN c.id_Usuario1= u.id_Usuario END  AND (c.id_Usuario1 =? OR c.id_Usuario2 =?) AND (c.borrado_Logico!=? and c.borrado_Logico!=?)",[solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,-1,solicitud.body.id_Usuario],function(error,resBD,filas){
+    var listaMensajes=db.query("SELECT u.id_Usuario,c.id_Conversacion,u.nombres,u.apellidos, u.foto FROM Conversacion c, Usuario u WHERE CASE WHEN c.id_Usuario1 = ? THEN c.id_Usuario2 = u.id_Usuario WHEN c.id_Usuario2 = ? THEN c.id_Usuario1= u.id_Usuario END  AND (c.id_Usuario1 =? OR c.id_Usuario2 =?) AND (c.borrado_Logico!=? and c.borrado_Logico!=?)",[solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,-1,solicitud.body.id_Usuario],function(error,resBD,filas){
     if(error){
         console.log(error);
     }else{ 
+        //Transforma en string el resultado de la foto enviado de la consulta pues esta guardada en codigo 64
+        var f;
+        for (var i = 0; i < resBD.length; i++) {
+          f=resBD[i].foto;      
+          resBD[i].foto=f.toString();
+        };
         respuesta.json(resBD);   //terminar la peticion 
     }  
  
@@ -112,7 +123,7 @@ var message=solicitud.body.message;
 
                         try{ 
                           //Con el socket se envia un mensaje al usuario destinatario
-                          io.sockets.to(u.socket_id).emit('new message',{'contenido':solicitud.body.message,'nombres':solicitud.body.nombres,'apellidos':solicitud.body.apellidos,'tipo_Mensaje':solicitud.body.tipo_Mensaje});
+                          io.sockets.to(u.socket_id).emit('new message',{'contenido':solicitud.body.message,'nombres':solicitud.body.nombres,'apellidos':solicitud.body.apellidos,'tipo_Mensaje':solicitud.body.tipo_Mensaje,'id_Usuario':solicitud.body.id_Usuario});
                         }catch(err){
                           console.log(err);
                         } 
