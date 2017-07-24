@@ -33,8 +33,9 @@ var sendNotificationToUser=function(token,message) {
     },
     body: JSON.stringify({
       notification: {
-        title: message,
-        icon:"p.png"
+        title: "Documentos Extraviados",
+        icon:"p.png",
+        body:message
       },
       to : token
     })
@@ -91,7 +92,7 @@ router.post('/crearPublicacionE', function(solicitud, respuesta, next) {
                                 console.log(error);
                               }else{
                                 if(resBD!=""){
-                                  var mensaje="Se ha creado una publicación que esta vinculada con el siguiente número de cedula "+solicitud.body.numero_Documento;
+                                  var mensaje="El número de cédula "+solicitud.body.numero_Documento+ " se encuentra en un anuncio";
                                   var t=resBD[0]['token']+"";
                                   sendNotificationToUser(t,mensaje);
                                 }
@@ -141,7 +142,9 @@ var crearPublicacionP=db.query('INSERT INTO Publicacion(fecha_Publicacion,fecha_
                       console.log(error);
                     }else{
                       if(resBD!=""){
-                        var mensaje="Se creo una publicación con el siguiente número de cedula "+solicitud.body.numero_Documento;
+                        var mensaje="El número de cédula "+solicitud.body.numero_Documento+ " se encuentra en un anuncio";
+                                  //"El numero 1105679664 esta en un anuncio
+                                  //En un anuncio está el # de cedula
                         var t=resBD[0]['token']+"";
                         sendNotificationToUser(t,mensaje);
                       }

@@ -31,7 +31,7 @@ router.post('/iniciarsession', function(solicitud, respuesta, next) {
   })
 });
 router.post('/guardarToken', function(solicitud, respuesta, next) {  
-console.log(solicitud.body);    
+//console.log(solicitud.body);    
   var modificarToken=db.query("UPDATE Usuario SET token=? WHERE id_Usuario=?", [solicitud.body.tK,solicitud.body.idUs],function(error,resBD2,filas){
     if(error){
       console.log(error);
@@ -194,7 +194,7 @@ router.post('/verUsuario', function(solicitud, respuesta, next) {
               //Al email destinatorio
               to:resBD2[0]['email'], 
               //La siguiente descripcion
-              subject:"Mi asunto",
+              subject:"Documentos Extravidos",
               //La informacion email, celular, link_Facebook
               html:cadenaEmail      
             }
@@ -242,7 +242,7 @@ router.post('/enviarInfoUsuario',function(solicitud,respuesta){
           var mailOpciones={
             from:"karyto743@gmail.com",
             to:email, 
-            subject:"Mi asunto",
+            subject:"Documentos Extravidos",
             html:cadenaContrasena      
           }
           nodeM.sendMail(mailOpciones,function(error,respuesta){

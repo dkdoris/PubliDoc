@@ -1,4 +1,4 @@
-module.exports=function(io,db){//Importar y exportar módulos a node
+module.exports=function(io,db,request){//Importar y exportar módulos a node
 //Framewor que utiliza node
 var express = require('express'),
 //inposta el modulo para trabajar con rutas o direccciones
@@ -99,8 +99,10 @@ var sendNotificationToUser=function(token,message) {
       'Authorization': 'key='+API_KEY
     },
     body: JSON.stringify({
-      notification: {
-        title: message
+      notification: {        
+        title: "Documentos Extraviados",
+        icon:"p.png",
+        body:message
       },
       to : token
     })
@@ -130,6 +132,8 @@ router.post('/guardarMensaje', function(solicitud, respuesta, next) {
   if (segundo < 10) {segundo = "0" + segundo}
   var horita = hora + ":" + minuto + ":" + segundo
 var message=solicitud.body.message;
+//console.log("Guardar Mensaje");
+//console.log(solicitud.body);
   if(solicitud.body.id_Conversacion>0){
     var seleccionarBorradoLogico=db.query("SELECT borrado_Logico from Conversacion WHERE id_Conversacion=? and ((id_Usuario1=? and id_Usuario2=?)OR(id_Usuario1=? and id_Usuario2=?))",[solicitud.body.id_Conversacion,solicitud.body.id_Usuario,solicitud.body.id_Usuario2,solicitud.body.id_Usuario2,solicitud.body.id_Usuario],function(error,resBL,filas){
       if(error){

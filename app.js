@@ -99,7 +99,7 @@ app.use('/users', users);
 app.use('/admin', admin(conecccion));
 app.use('/usuario', usuario(conecccion));
 app.use('/publicacion', publicacion(conecccion,request));
-app.use('/mensaje', mensaje(app.io,conecccion));
+app.use('/mensaje', mensaje(app.io,conecccion,request));
 app.use('/anuncio', anuncio(conecccion));
 
 // catch 404 and forward to error handler
