@@ -283,7 +283,7 @@ router.post('/obtenerInfoUser', function(solicitud, respuesta, next) {
 });
 //******************Denuncias******************//
 router.post('/denunciarU', function(solicitud, respuesta, next) { 
-  var buscarPubli=db.query("INSERT INTO Denuncia(id_UsuarioA,id_UsuarioD,tipo,descripcion) VALUES(?,?,?,?)", [solicitud.body.id_UsuarioA,solicitud.body.id_UsuarioD,0,solicitud.body.descripcion],function(error,resBD,filas){    
+  var buscarPubli=db.query("INSERT INTO Denuncia(id_UsuarioA,id_UsuarioD,tipo,descripcion,borrado_Logico) VALUES(?,?,?,?,?)", [solicitud.body.id_UsuarioA,solicitud.body.id_UsuarioD,0,solicitud.body.descripcion,0],function(error,resBD,filas){    
     if(error){
       console.log(error);
     }else{      

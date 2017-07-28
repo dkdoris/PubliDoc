@@ -16,14 +16,18 @@ var router = express.Router();
              var iniciarsession=db.query("SELECT *FROM Usuario WHERE rol!='admin'",function(error,usuarios){
                   if(error){
                     console.log(error);                  
+                    respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error Interno' });  
                   }else{                    
-                    var consultardenuncias=db.query("SELECT *FROM denuncia WHERE borrado_Logico=0",function(error,denuncias){
+                    var consultardenuncias=db.query("SELECT *FROM Denuncia WHERE borrado_Logico=0",function(error,denuncias){
                       if(error){
-
+                        console.log(error);
+                        respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error Interno' });
                       }else{                        
-                            var usuarios_denunciados= new Array();
-                            var publicaciones_denunciadas=new Array();
-                            denuncias.forEach(function(element) {
+                          
+                        var usuarios_denunciados= new Array();
+                        var publicaciones_denunciadas=new Array();
+
+                          denuncias.forEach(function(element) {
                               console.log(element);
                           if(element['tipo']==0){
                             usuarios_denunciados.push(element);  
@@ -31,6 +35,7 @@ var router = express.Router();
                             publicaciones_denunciadas.push(element); 
                           }
                         }, this);
+
                         respuesta.render('admin',{tituloPag:"Gestión de Usuarios",nombre_usuario:solicitud.session.nombre,list_usuarios:usuarios, list_denuncia_u:usuarios_denunciados,list_denuncia_p:publicaciones_denunciadas});                                                                             
                       }                                            
                     });                                        
