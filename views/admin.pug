@@ -1,0 +1,120 @@
+doctype html
+html(lang='en')
+	head
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		meta(name='description', content='A front-end template that helps you build fast, modern mobile web apps.')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0, minimum-scale=1.0')
+		title Material Design Lite
+		// Add to homescreen for Chrome on Android
+		meta(name='mobile-web-app-capable', content='yes')
+		link(rel='icon', sizes='192x192', href='images/android-desktop.png')
+		// Add to homescreen for Safari on iOS
+		meta(name='apple-mobile-web-app-capable', content='yes')
+		meta(name='apple-mobile-web-app-status-bar-style', content='black')
+		meta(name='apple-mobile-web-app-title', content='Material Design Lite')
+		link(rel='apple-touch-icon-precomposed', href='images/ios-desktop.png')
+		// Tile icon for Win8 (144x144 + tile color)
+		meta(name='msapplication-TileImage', content='images/touch/ms-touch-icon-144x144-precomposed.png')
+		meta(name='msapplication-TileColor', content='#3372DF')
+		link(rel='shortcut icon', href='images/favicon.png')
+		// SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones
+		//
+			<link rel="canonical" href="http://www.example.com/">
+		link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&lang=en')
+		link(rel='stylesheet', href='https://fonts.googleapis.com/icon?family=Material+Icons')
+		link(rel='stylesheet', href='https://code.getmdl.io/1.3.0/material.deep_purple-pink.min.css')
+		link(rel='stylesheet', href='/stylesheets/styles.css')
+		script(src='/javascripts/jquery-1.11.2.min.js')
+		script(type='text/javascript' src='/javascripts/admin_usuarios.js')
+		style.
+			#view-source {
+			position: fixed;
+			display: block;
+			right: 0;
+			bottom: 0;
+			margin-right: 40px;
+			margin-bottom: 40px;
+			z-index: 900;
+			}
+	body.mdl-demo.mdl-color--grey-100.mdl-color-text--grey-700.mdl-base
+		.mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+			header.mdl-layout__header.mdl-layout__header--scroll.mdl-color--primary
+				.mdl-layout--large-screen-only.mdl-layout__header-row
+				.mdl-layout--large-screen-only.mdl-layout__header-row
+					h3 Administrador Documentos Extraviados
+				.mdl-layout--large-screen-only.mdl-layout__header-row
+				.mdl-layout__tab-bar.mdl-js-ripple-effect.mdl-color--primary-dark
+					a.mdl-layout__tab.is-active(href='#g_user') Gestion de Usuarios
+					a.mdl-layout__tab(href='#d_user') Usuarios Denunciados
+					a.mdl-layout__tab(href='#d_public') Publicaciones Denunciadas					
+			main.mdl-layout__content
+				#g_user.mdl-layout__tab-panel.is-active
+					section.section--center.mdl-grid.mdl-grid--no-spacing.mdl-shadow--2dp
+						.mdl-card.mdl-cell.mdl-cell--12-col
+							.mdl-card__supporting-text.mdl-grid.mdl-grid--no-spacing
+								h4.mdl-cell.mdl-cell--12-col Lista de Usuarios
+									if list_usuarios.length==0
+										h5 No existen Usuarios Registrados
+									else	
+										table(id="container" class="mdl-data-table mdl-js-data-table")
+											thead
+												tr
+													th(class="mdl-data-table__cell--non-numeric") Nombres											
+													th(class="mdl-data-table__cell--non-numeric") Cedula											
+													th(class="mdl-data-table__cell--non-numeric") Estado		
+													th(class="mdl-data-table__cell--non-numeric") Opciones
+											each usuario in list_usuarios
+												tr(class="obtener_usuario")
+													td #{usuario.nombres}											
+													td #{usuario.cedula}									
+													if usuario.borrado_Logico == 1
+														td Baja
+													else
+														td Alta
+													td
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_ActDes" type="submit" id=usuario.id_Usuario) Act/Desc
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_restaurar_contrasena" id=usuario.id_Usuario type="submit") Restaurar Contraseña
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_eliminar_usuario" id=usuario.id_Usuario type="submit") Eliminar
+				#d_user.mdl-layout__tab-panel
+					section.section--center.mdl-grid.mdl-grid--no-spacing.mdl-shadow--2dp
+						.mdl-card.mdl-cell.mdl-cell--12-col
+							.mdl-card__supporting-text.mdl-grid.mdl-grid--no-spacing
+								h4.mdl-cell.mdl-cell--12-col Lista de Usuarios Denunciados
+									if list_usuarios.length==0
+										h5 No existen Usuarios Denunciados
+									else
+										table(id="container" class="mdl-data-table mdl-js-data-table")
+											thead
+												tr
+													th(class="mdl-data-table__cell--non-numeric") Motivo											
+													th(class="mdl-data-table__cell--non-numeric") Opciones
+											each denunciaU in list_denuncia_u
+												tr(class="obtener_usuario")
+													td #{denunciaU.descripcion}																																						
+													td
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_ActDes" type="submit" id=denunciaU.id_PublicacionA) Ver Usuario
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_ActDes" type="submit" id=denunciaU.id_PublicacionD) Ver Denunciante
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_eliminar_usuario" id=denunciaU.id_Denuncia type="submit") Omitir
+				#d_public.mdl-layout__tab-panel
+					section.section--center.mdl-grid.mdl-grid--no-spacing.mdl-shadow--2dp
+						.mdl-card.mdl-cell.mdl-cell--12-col
+							.mdl-card__supporting-text.mdl-grid.mdl-grid--no-spacing
+								h4.mdl-cell.mdl-cell--12-col Lista de Publicaciones Denunciadas
+									if list_usuarios.length==0
+										h5 No existen Publicaciones Denunciadas
+									else
+										table(id="container" class="mdl-data-table mdl-js-data-table")
+											thead
+												tr
+													th(class="mdl-data-table__cell--non-numeric") Motivo
+													th(class="mdl-data-table__cell--non-numeric") Opciones
+											each denunciaP in list_denuncia_p
+												tr(class="obtener_usuario")
+													td #{denunciaP.descripcion}																																						
+													td
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_ActDes" type="submit" id=denunciaP.id_PublicacionD) Ver Publicacion
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_ActDes" type="submit" id=denunciaP.id_UsuarioD) Ver Denunciante
+														button(class="mdl-button mdl-js-button mdl-button--primary" name="btn_eliminar_usuario" id=denunciaP.id_Denuncia type="submit") Omitir
+				footer.mdl-mega-footer
+					script(src='https://code.getmdl.io/1.3.0/material.min.js')

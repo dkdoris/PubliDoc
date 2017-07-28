@@ -8,18 +8,32 @@ var router = express.Router();
       if(error){
         console.log(error);      
        respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error en la consulta' });  
-    }else{
-      //devuelve la respuesta json el servidor
-      //console.log(consulta.length);
-      solicitud.session.nombre=consulta[0].nombres;
-      solicitud.session._id=consulta[0].id_Usuario;                   
+    }else{      
+      console.log(consulta);                        
       if(consulta.length>0){
+      solicitud.session.nombre=consulta[0].nombres;
+      solicitud.session._id=consulta[0].id_Usuario; 
              var iniciarsession=db.query("SELECT *FROM Usuario WHERE rol!='admin'",function(error,usuarios){
                   if(error){
                     console.log(error);                  
-                  }else{                                        
-                    respuesta.render('admin_principal',{nombre_usuario:solicitud.session.nombre,list_usuarios:usuarios});                    
-                      //respuesta.render('admin_principal',{nombre_usuario:"Administrador",list_usuarios:usuarios});                                                          
+                  }else{                    
+                    var consultardenuncias=db.query("SELECT *FROM denuncia WHERE borrado_Logico=0",function(error,denuncias){
+                      if(error){
+
+                      }else{                        
+                            var usuarios_denunciados= new Array();
+                            var publicaciones_denunciadas=new Array();
+                            denuncias.forEach(function(element) {
+                              console.log(element);
+                          if(element['tipo']==0){
+                            usuarios_denunciados.push(element);  
+                          }else{
+                            publicaciones_denunciadas.push(element); 
+                          }
+                        }, this);
+                        respuesta.render('admin',{tituloPag:"Gestión de Usuarios",nombre_usuario:solicitud.session.nombre,list_usuarios:usuarios, list_denuncia_u:usuarios_denunciados,list_denuncia_p:publicaciones_denunciadas});                                                                             
+                      }                                            
+                    });                                        
                   }
 
               })
@@ -32,12 +46,13 @@ var router = express.Router();
 
 
 router.put('/restaurar_contrasena', function(solicitud, respuesta, next) {
-  var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
+  var id=parseInt(solicitud.body.id.toString());  
+  var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[id],function(error,usuario){
      if(error){
        console.log(error);                  
      }else{
         if(usuario.length>0){          
-          var consulta1=db.query('UPDATE Usuario SET contrasena=? WHERE id_Usuario=?',[usuario[0].cedula,solicitud.body.id],function(error,resBD){
+          var consulta1=db.query('UPDATE Usuario SET contrasena=? WHERE id_Usuario=?',[usuario[0].cedula,id],function(error,resBD){
             if(error){
                 console.log(error); 
             }else{
@@ -59,8 +74,9 @@ router.put('/restaurar_contrasena', function(solicitud, respuesta, next) {
   */
 });
 
-router.put('/estado_usuario', function(solicitud, respuesta, next) {
-   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
+router.put('/estado_usuario', function(solicitud, respuesta, next) {  
+  var id=parseInt(solicitud.body.id.toString());  
+   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[id],function(error,usuario){
      if(error){
        console.log(error);                  
      }else{
@@ -71,42 +87,35 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
           }else{
             estado=0;
           }
-          var consulta1=db.query('UPDATE Usuario SET borrado_Logico=? WHERE id_Usuario=?',[estado,solicitud.body.id],function(error,resBD){
+          var consulta1=db.query('UPDATE Usuario SET borrado_Logico=? WHERE id_Usuario=?',[estado,id],function(error,resBD){
             if(error){
                 console.log(error); 
-            }else{
-              
-              var darDeBajaP=db.query('UPDATE Publicacion SET borrado_Logico=? WHERE id_Usuario=?',[1,solicitud.body.id],function(error,res){
-                  if(error){
-                      console.log(error); 
-                  }else{
-                    
-                                  
-                  }
-              })
+            }else{          
               respuesta.json("Se ha Modificado el estado correctamente");                
             }
-          })
-        }
-
+          });
+        }else{
+          respuesta.json("Error al encontrar usuario");
+        }        
      }
-  })
+  });
 });
  
 router.delete('/eliminar_usuario', function(solicitud, respuesta, next) {
-   var consulta=db.query("DELETE FROM Usuario WHERE id_Usuario=?",[solicitud.body.id],function(error,resBD){
+  var id=parseInt(solicitud.body.id.toString());  
+   var consulta=db.query("DELETE FROM Usuario WHERE id_Usuario=?",[id],function(error,resBD){
      if(error){
        console.log(error);                  
      }else{
-         var darDeBajaP=db.query('DELETE FROM Publicacion WHERE id_Usuario=?',[solicitud.body.id],function(error,res){
+         var darDeBajaP=db.query('DELETE FROM Publicacion WHERE id_Usuario=?',[id],function(error,res){
           if(error){
             console.log(error); 
-          }else{                                               
+          }else{
+           respuesta.send("Eliminado Correctamente");                                                
           }
-        })      
-       respuesta.send("Usuario eliminado correctamente");
+        });      
      }
-  })
+  });
 });
 
 router.post('/mostrar_perfil', function(solicitud, respuesta, next) {
