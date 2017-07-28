@@ -305,6 +305,16 @@ router.post('/buscarPublicacion', function(solicitud, respuesta, next) {
   } 
   })
 });
+//******************Denuncias******************//
+router.post('/denunciarP', function(solicitud, respuesta, next) { 
+  var buscarPubli=db.query("INSERT INTO Denuncia(id_UsuarioA,id_UsuarioD,tipo,id_PublicacionD,descripcion) VALUES(?,?,?,?,?)", [solicitud.body.id_UsuarioA,solicitud.body.id_UsuarioD,1,solicitud.body.id_PublicacionD,solicitud.body.descripcion],function(error,resBD,filas){    
+    if(error){
+      console.log(error);
+    }else{      
+      respuesta.json(resBD);   //terminar la peticion 
+    } 
+  })
+});
 return router;
 }
 

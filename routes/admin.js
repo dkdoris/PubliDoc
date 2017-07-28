@@ -10,8 +10,8 @@ var router = express.Router();
        respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error en la consulta' });  
     }else{
       //devuelve la respuesta json el servidor
-      console.log(consulta.length);
-      solicitud.session.nombre=consulta[0].nombres+" "+consulta[0].apellidos;
+      //console.log(consulta.length);
+      solicitud.session.nombre=consulta[0].nombres;
       solicitud.session._id=consulta[0].id_Usuario;                   
       if(consulta.length>0){
              var iniciarsession=db.query("SELECT *FROM Usuario WHERE rol!='admin'",function(error,usuarios){
@@ -75,6 +75,15 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
             if(error){
                 console.log(error); 
             }else{
+              
+              var darDeBajaP=db.query('UPDATE Publicacion SET borrado_Logico=? WHERE id_Usuario=?',[1,solicitud.body.id],function(error,res){
+                  if(error){
+                      console.log(error); 
+                  }else{
+                    
+                                  
+                  }
+              })
               respuesta.json("Se ha Modificado el estado correctamente");                
             }
           })
@@ -89,8 +98,31 @@ router.delete('/eliminar_usuario', function(solicitud, respuesta, next) {
      if(error){
        console.log(error);                  
      }else{
+         var darDeBajaP=db.query('DELETE FROM Publicacion WHERE id_Usuario=?',[solicitud.body.id],function(error,res){
+          if(error){
+            console.log(error); 
+          }else{                                               
+          }
+        })      
        respuesta.send("Usuario eliminado correctamente");
      }
+  })
+});
+
+router.post('/mostrar_perfil', function(solicitud, respuesta, next) {
+  //console.log(solicitud.body.id);
+  var mostrarPerfil=db.query('SELECT *FROM Usuario WHERE id_Usuario=?',[solicitud.param('id')],function(error,res){
+    if(error){
+      console.log(error); 
+    }else{   
+      var f=res[0].foto;      
+      //var f2=;
+      var f2="data:image/jpeg;base64,"+f.toString();
+      res[0].foto=f2;  
+      //$scope.imgURI = "data:image/jpeg;base64," + imageData;
+      //console.log("respuesta "+res[0]['nombres']);
+      respuesta.render('perfil',{cuenta:res});
+    }
   })
 });
 

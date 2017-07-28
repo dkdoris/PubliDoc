@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
 //realiza una consulta a la base de datos para saber si los datos (cedula y contraseña) ingresados por el usuario pertenecen a alguna cuenta
 router.post('/iniciarsession', function(solicitud, respuesta, next) {
 
-  var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=?",[solicitud.body.cedula,solicitud.body.contrasena],function(error,columnas,filas){
+  var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=?",[solicitud.body.cedula,solicitud.body.contrasena,0],function(error,columnas,filas){
       if(error){
         console.log(error);
     }else{
@@ -230,7 +230,7 @@ var generarContrasena=function(){
 router.post('/enviarInfoUsuario',function(solicitud,respuesta){
 
     var email=solicitud.body.email;
-    var validarEmail=db.query("SELECT *FROM Usuario WHERE cedula=? and email=?",[solicitud.body.cedula,email],function(error,res,filas){
+    var validarEmail=db.query("SELECT *FROM Usuario WHERE cedula=? and email=? and borrado_Logico=?",[solicitud.body.cedula,email,0],function(error,res,filas){
       if(error){
         console.log(error);
       }else{
@@ -277,6 +277,26 @@ router.post('/obtenerInfoUser', function(solicitud, respuesta, next) {
              var f=resBD[0].foto;      
         resBD[0].foto=f.toString(); 
 
+      respuesta.json(resBD);   //terminar la peticion 
+    }  
+  })
+});
+//******************Denuncias******************//
+router.post('/denunciarU', function(solicitud, respuesta, next) { 
+  var buscarPubli=db.query("INSERT INTO Denuncia(id_UsuarioA,id_UsuarioD,tipo,descripcion) VALUES(?,?,?,?)", [solicitud.body.id_UsuarioA,solicitud.body.id_UsuarioD,0,solicitud.body.descripcion],function(error,resBD,filas){    
+    if(error){
+      console.log(error);
+    }else{      
+      respuesta.json(resBD);   //terminar la peticion 
+    } 
+  })
+});
+/*****************Cerrar cuenta bloqueada******************/
+router.post('/cuentaBloqueada', function(solicitud, respuesta, next) { 
+  var cuenta=db.query("SELECT borrado_Logico FROM Usuario WHERE id_Usuario=?",[solicitud.body.id_Usuario],function(error,resBD,filas){
+    if(error){
+      console.log(error);
+    }else{ 
       respuesta.json(resBD);   //terminar la peticion 
     }  
   })
