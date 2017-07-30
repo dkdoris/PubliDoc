@@ -3,53 +3,57 @@ var express = require('express');
 var router = express.Router();
 
   /* GET admin listing. */
-    router.post('/', function(solicitud, respuesta, next) {  
-      var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=? and rol='admin'",[solicitud.body.usuario,solicitud.body.contrasena],function(error,consulta){
-      if(error){
-        console.log(error);      
-       respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error en la consulta' });  
-    }else{      
-      console.log(consulta);                        
-      if(consulta.length>0){
-      solicitud.session.nombre=consulta[0].nombres;
-      solicitud.session._id=consulta[0].id_Usuario; 
-             var iniciarsession=db.query("SELECT *FROM Usuario WHERE rol!='admin'",function(error,usuarios){
+    router.post('/iniciarSesion', function(solicitud, respuesta, next) {
+      console.log(solicitud.body);  
+      var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=? and rol='admin'",[solicitud.body.usuario,solicitud.body.contrasena],function(error,usuario){
+        if(error){         
+           respuesta.json("1");  
+        }else{
+          console.log(usuario);      
+          if(usuario.length>0){              
+              solicitud.session.nombre=usuario[0].nombres;
+              solicitud.session._id=usuario[0].id_Usuario;       
+              respuesta.json(usuario);
+          }else{
+            respuesta.json("");
+        }
+      }
+    });      
+  });
+
+    router.get('/listaUsuarios', function(solicitud, respuesta, next) {  
+      var consulta=db.query("SELECT *FROM Usuario WHERE rol!='admin'",function(error,usuarios){
                   if(error){
                     console.log(error);                  
-                    respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error Interno' });  
-                  }else{                    
-                    var consultardenuncias=db.query("SELECT *FROM Denuncia WHERE borrado_Logico=0",function(error,denuncias){
-                      if(error){
-                        console.log(error);
-                        respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Error Interno' });
-                      }else{                        
-                          
-                        var usuarios_denunciados= new Array();
-                        var publicaciones_denunciadas=new Array();
+                    respuesta.json(1);  
+                  }else{                      
+                    respuesta.json(usuarios);
+                   }
+              })       
+      });
 
-                          denuncias.forEach(function(element) {
-                              console.log(element);
-                          if(element['tipo']==0){
-                            usuarios_denunciados.push(element);  
-                          }else{
-                            publicaciones_denunciadas.push(element); 
-                          }
-                        }, this);
+      router.get('/listaUsuariosDenunciados', function(solicitud, respuesta, next) {  
+      var consulta=db.query("SELECT *FROM Denuncia WHERE borrado_Logico=0 and tipo=0",function(error,usuariosDenuncias){
+                  if(error){
+                    console.log(error);                  
+                    respuesta.json(1);  
+                  }else{                      
+                    respuesta.json(usuariosDenuncias);
+                   }
+              })       
+      });
 
-                        respuesta.render('admin',{tituloPag:"Gestión de Usuarios",nombre_usuario:solicitud.session.nombre,list_usuarios:usuarios, list_denuncia_u:usuarios_denunciados,list_denuncia_p:publicaciones_denunciadas});                                                                             
-                      }                                            
-                    });                                        
-                  }
-
-              })
-      }else{
-       respuesta.render('index', { title: 'Administrador PubliDoc', msj:'Usuario o contraseña incorrectos' });  
-      }             
-    } 
-   })      
-    });
-
-
+      router.get('/listaPublicacionesDenunciadas', function(solicitud, respuesta, next) {  
+      var consulta=db.query("SELECT *FROM Denuncia WHERE borrado_Logico=0 and tipo=1",function(error,publicacionesDenuncias){
+                  if(error){
+                    console.log(error);                  
+                    respuesta.json(1);  
+                  }else{                      
+                    respuesta.json(publicacionesDenuncias);
+                   }
+              })       
+      });
+  
 router.put('/restaurar_contrasena', function(solicitud, respuesta, next) {
   var id=parseInt(solicitud.body.id.toString());  
   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[id],function(error,usuario){
