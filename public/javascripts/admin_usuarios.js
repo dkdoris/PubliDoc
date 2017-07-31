@@ -24,8 +24,7 @@ $('[name=btn_restaurar_contrasena]').on('click',function(e){
 			data:{id:id}
 		})
 		.done(function(doc){
-			alert(doc);			
-			location.reload();
+			alert(doc);	
 		});        
 	});
 

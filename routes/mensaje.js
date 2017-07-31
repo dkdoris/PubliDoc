@@ -322,11 +322,11 @@ router.post('/seleccionarUsuarioConversacion', function(solicitud, respuesta, ne
 });
 //*********************************Selecciona inicio Conversacion*********************************//
 //Realiza la consulta para devolver a la aplicacion el inicio_Conversacion, lo cual servira para saber si el usuario dueño de la cuenta tiene una conversacion nueva
-router.post('/mostrarNuevoMsj', function(solicitud, respuesta, next) {
+router.post('/mostrarNuevoMsj', function(solicitud, respuesta, next) {  
     var mostrarMensajesNuevo=db.query("SELECT inicio_Conversacion from Conversacion where inicio_Conversacion=?",[solicitud.body.idIdentificacion],function(error,resBD,filas){
       if(error){
         console.log(error);
-      }else{ 
+      }else{         
         respuesta.json(resBD);   //terminar la peticion 
       }  
        

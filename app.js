@@ -81,9 +81,6 @@ app.io= require("socket.io")();
 //var mostraUsuario=conecccion.query('SELECT *FROM Usuario',function(error,columnas,filas){
 
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade'); //plantilla jade
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

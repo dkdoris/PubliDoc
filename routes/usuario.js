@@ -274,16 +274,15 @@ router.post('/obtenerInfoUser', function(solicitud, respuesta, next) {
       console.log(error);
     }else{ 
   //terminar la peticion 
-             var f=resBD[0].foto;      
+        var f=resBD[0].foto;      
         resBD[0].foto=f.toString(); 
-
       respuesta.json(resBD);   //terminar la peticion 
     }  
   })
 });
 //******************Denuncias******************//
 router.post('/denunciarU', function(solicitud, respuesta, next) { 
-  var buscarPubli=db.query("INSERT INTO Denuncia(id_UsuarioA,id_UsuarioD,tipo,descripcion) VALUES(?,?,?,?)", [solicitud.body.id_UsuarioA,solicitud.body.id_UsuarioD,0,solicitud.body.descripcion],function(error,resBD,filas){    
+  var buscarPubli=db.query("INSERT INTO Denuncia(id_UsuarioA,id_UsuarioD,tipo,descripcion,borrado_Logico) VALUES(?,?,?,?,?)", [solicitud.body.id_UsuarioA,solicitud.body.id_UsuarioD,0,solicitud.body.descripcion,0],function(error,resBD,filas){    
     if(error){
       console.log(error);
     }else{      

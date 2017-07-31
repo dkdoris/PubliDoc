@@ -89,8 +89,8 @@ router.put('/modificarCalificar', function(solicitud, respuesta, next) {
 //********************************Promedio total de calificacion de usuario******************************************//
 //Con avg se saca el promedio de todas las calificaciones que tiene un usuario
   router.post('/promedioCalificar', function(solicitud, respuesta, next) {
-    console.log(solicitud.body.id_UsuarioP);
-    var promedioCalificacion=db.query('SELECT avg(calif) from Calificacion WHERE id_UsuarioP=?',[solicitud.body.id_UsuarioP],function(error,res,filas){
+   // console.log(solicitud.body.id_UsuarioP);
+    var promedioCalificacion=db.query('SELECT avg(calif) from Calificacion WHERE id_UsuarioP=? and calif>?',[solicitud.body.id_UsuarioP,0],function(error,res,filas){
       if(error){
         console.log(error);
       }else{
