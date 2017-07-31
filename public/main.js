@@ -36,12 +36,10 @@ app.controller( 'loginController', function($scope, $http,$state) {
         contrasena:""
     }
     $scope.iniciarSession = function(){
-        alert($scope.varIniciarSession.usuario);
         $http.post('/admin/iniciarSesion', $scope.varIniciarSession)
             .then(function(data) {
-                alert(data);
                 if(data!=1){              
-                    $state.go("principal");                
+                    $state.go("principal.gestion_usuarios");                
                 }               
             })
             .catch(function(data) {                
@@ -50,37 +48,104 @@ app.controller( 'loginController', function($scope, $http,$state) {
     };
 })
 .controller('principalController',function($scope, $http,$state){
-    alert("principal");
 })
-.controller('gestion_usuariosController',function($scope, $http,$state){
-
+.controller('gestion_usuariosController',function($scope, $http,$state){  
+    $scope.mensaje="";
+    $scope.listarUser=function(){
      $http.get('/admin/listaUsuarios')
-            .then(function(data) {                
-              alert(data);
-              $scope.listaUsuarios=data;
+            .then(function(data) {            
+              $scope.listaUsuarios=data['data'];
             })
             .catch(function(data) {                
                 console.log('Error:' + data);
             });
+    }
+    $scope.listarUser();
+
+    $scope.desactivar=function(id){
+        $http.put('/admin/estado_usuario',{id})
+            .then(function(data) {  
+                $scope.listarUser(); 
+                if(data['data']==0){
+                    $scope.mensaje="Usuario activo";
+                }else{
+                    $scope.mensaje="Usuario inactivo";
+                }                
+            })
+            .catch(function(data) {                
+                console.log('Error:' + data);
+            });            
+        
+    }
+    $scope.restaurarContrasena=function(id,cedula){
+        $http.put('/admin/restaurar_contrasena',{id,cedula})
+            .then(function(data) {                            
+                //$scope.restaurarC=data['data'];
+                //console.log(data);
+                $scope.mensaje="Se restablecio la constarsena";
+            })
+            .catch(function(data) {                
+                console.log('Error:' + data);
+            });                
+    }            
 })
 .controller('denuncias_usuariosController',function($scope, $http,$state){
-    $http.get('/admin/listaUsuariosDenunciados')
+    $scope.mensajeDU="";
+    $scope.cargarDenuncias=function(){
+        $http.get('/admin/listaUsuariosDenunciados')
+                .then(function(data) {                
+                $scope.listaUsuariosDenunciados=data['data'];
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+                });
+    };
+    $scope.cargarDenuncias(); 
+    $scope.omitirDenucia=function(id_Denuncia){
+        $http.put('/admin/omitirDenunciaUsuario',{id_Denuncia})
             .then(function(data) {                
-              alert(data);
-              $scope.listaUsuariosDenunciados=data;
+                $scope.mensajeDU="La denuncia ha sido omitida";
+                //$state.go("principal.denuncias_usuarios");  
+                $scope.cargarDenuncias(); 
             })
             .catch(function(data) {                
-                console.log('Error:' + data);
-            });
+                    console.log('Error:' + data);
+                });
+    };
+    $scope.mostrarPerfil=function(id_Usuario,denunciaUsuario){
+        $scope.denuncia=denunciaUsuario;
+        $http.post('/admin/mostrar_perfil',{id_Usuario})
+            .then(function(data) {                
+                $scope.datosUsuario=data['data'][0];
+                console.log(data);
+                alert($scope.datosUsuario.cedula);
+            })
+            .catch(function(data) {                
+                    console.log('Error:' + data);
+                });
+    };                                      
 })
 .controller('denuncias_publicacionesController',function($scope, $http,$state){
-    $http.get('/admin/listaPublicacionesDenunciadas')
+    $scope.cargarDenunciasPublicaciones=function(){
+        $http.get('/admin/listaPublicacionesDenunciadas')
+                .then(function(data) {                
+                $scope.listaPublicacionesDenunciadas=data['data'];
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+                });
+    }
+    $scope.cargarDenunciasPublicaciones();
+    $scope.omitirDenucia=function(id_Denuncia){
+        $http.put('/admin/omitirDenunciaUsuario',{id_Denuncia})
             .then(function(data) {                
-              alert(data);
-              $scope.listaPublicacionesDenunciadas=data;
+                $scope.mensajeDP="La denuncia ha sido omitida";
+                //$state.go("principal.denuncias_usuarios");  
+                $scope.cargarDenunciasPublicaciones();
             })
             .catch(function(data) {                
-                console.log('Error:' + data);
-            });
+                    console.log('Error:' + data);
+                });
+    }; 
     
 })

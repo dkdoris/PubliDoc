@@ -26,7 +26,7 @@ var router = express.Router();
                   if(error){
                     console.log(error);                  
                     respuesta.json(1);  
-                  }else{                      
+                  }else{                    
                     respuesta.json(usuarios);
                    }
               })       
@@ -42,7 +42,17 @@ var router = express.Router();
                    }
               })       
       });
-
+      router.put('/omitirDenunciaUsuario', function(solicitud, respuesta, next) {  
+      var consulta=db.query("UPDATE Denuncia SET borrado_logico=? where id_Denuncia=?",[1,solicitud.body.id_Denuncia],function(error,usuariosDenuncias){
+                  if(error){
+                    console.log(error);                  
+                    respuesta.json(1);  
+                  }else{                      
+                    respuesta.json(usuariosDenuncias);
+                   }
+              })       
+      });
+            
       router.get('/listaPublicacionesDenunciadas', function(solicitud, respuesta, next) {  
       var consulta=db.query("SELECT *FROM Denuncia WHERE borrado_Logico=0 and tipo=1",function(error,publicacionesDenuncias){
                   if(error){
@@ -55,37 +65,19 @@ var router = express.Router();
       });
   
 router.put('/restaurar_contrasena', function(solicitud, respuesta, next) {
-  var id=parseInt(solicitud.body.id.toString());  
-  var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[id],function(error,usuario){
-     if(error){
-       console.log(error);                  
-     }else{
-        if(usuario.length>0){          
-          var consulta1=db.query('UPDATE Usuario SET contrasena=? WHERE id_Usuario=?',[usuario[0].cedula,id],function(error,resBD){
+          var consulta1=db.query('UPDATE Usuario SET contrasena=? WHERE id_Usuario=?',[solicitud.body.cedula,solicitud.body.id],function(error,resBD){
             if(error){
-                console.log(error); 
+                console.log(error);
+                respuesta.json(error); 
             }else{
               respuesta.json("Se ha restaurado la contraseña correctamente");                
             }
           })
-        }else{
-
-        }
-
-     }
-  })
-  /*
-  if(solicitud.session.nombre){
-
-  }else{
-    respuesta.redirect('/');
-  }
-  */
 });
 
 router.put('/estado_usuario', function(solicitud, respuesta, next) {  
-  var id=parseInt(solicitud.body.id.toString());  
-   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[id],function(error,usuario){
+  //var id=parseInt(solicitud.body.id.toString());  
+   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
      if(error){
        console.log(error);                  
      }else{
@@ -96,11 +88,17 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
           }else{
             estado=0;
           }
-          var consulta1=db.query('UPDATE Usuario SET borrado_Logico=? WHERE id_Usuario=?',[estado,id],function(error,resBD){
+          var consulta1=db.query('UPDATE Usuario SET borrado_Logico=? WHERE id_Usuario=?',[estado,solicitud.body.id],function(error,resBD){
             if(error){
                 console.log(error); 
-            }else{          
-              respuesta.json("Se ha Modificado el estado correctamente");                
+            }else{   
+              var consulta1=db.query('UPDATE Publicacion SET borrado_Logico=? WHERE id_Usuario=?',[estado,solicitud.body.id],function(error,resBD){
+                if(error){
+                  console.log(error); 
+                }else{          
+                  respuesta.json(estado);                
+                }
+              });       
             }
           });
         }else{
@@ -110,36 +108,17 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
   });
 });
  
-router.delete('/eliminar_usuario', function(solicitud, respuesta, next) {
-  var id=parseInt(solicitud.body.id.toString());  
-   var consulta=db.query("DELETE FROM Usuario WHERE id_Usuario=?",[id],function(error,resBD){
-     if(error){
-       console.log(error);                  
-     }else{
-         var darDeBajaP=db.query('DELETE FROM Publicacion WHERE id_Usuario=?',[id],function(error,res){
-          if(error){
-            console.log(error); 
-          }else{
-           respuesta.send("Eliminado Correctamente");                                                
-          }
-        });      
-     }
-  });
-});
-
 router.post('/mostrar_perfil', function(solicitud, respuesta, next) {
-  //console.log(solicitud.body.id);
-  var mostrarPerfil=db.query('SELECT *FROM Usuario WHERE id_Usuario=?',[solicitud.param('id')],function(error,res){
+  console.log(solicitud.body);
+  var mostrarPerfil=db.query('SELECT *FROM Usuario WHERE id_Usuario=?',[solicitud.body.id_Usuario],function(error,res){
     if(error){
       console.log(error); 
     }else{   
-      var f=res[0].foto;      
-      //var f2=;
-      var f2="data:image/jpeg;base64,"+f.toString();
-      res[0].foto=f2;  
-      //$scope.imgURI = "data:image/jpeg;base64," + imageData;
-      //console.log("respuesta "+res[0]['nombres']);
-      respuesta.render('perfil',{cuenta:res});
+      //var f=res[0].foto;      
+     // var f2="data:image/jpeg;base64,"+f.toString();
+     // res[0].foto=f2;  
+      console.log(res);
+      respuesta.json(res);
     }
   })
 });
