@@ -4,7 +4,11 @@ var router = express.Router();
 
   /* GET admin listing. */
     router.post('/iniciarSesion', function(solicitud, respuesta, next) {
+<<<<<<< HEAD
    //   console.log(solicitud.body);  
+=======
+      console.log(solicitud.body);  
+>>>>>>> origin/master
       var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=? and rol='admin'",[solicitud.body.usuario,solicitud.body.contrasena],function(error,usuario){
         if(error){         
            respuesta.json("1");  
@@ -77,7 +81,10 @@ router.put('/restaurar_contrasena', function(solicitud, respuesta, next) {
 
 router.put('/estado_usuario', function(solicitud, respuesta, next) {  
   //var id=parseInt(solicitud.body.id.toString());  
+<<<<<<< HEAD
   console.log(solicitud.body);
+=======
+>>>>>>> origin/master
    var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
      if(error){
        console.log(error);                  
@@ -108,6 +115,7 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
      }
   });
 });
+<<<<<<< HEAD
 router.put('/inactivarDenuncia', function(solicitud, respuesta, next) {  
   //var id=parseInt(solicitud.body.id.toString());  
   console.log(solicitud.body);
@@ -143,13 +151,25 @@ router.put('/inactivarDenuncia', function(solicitud, respuesta, next) {
   });
 });
 router.post('/mostrar_perfil', function(solicitud, respuesta, next) {
+=======
+ 
+router.post('/mostrar_perfil', function(solicitud, respuesta, next) {
+  console.log(solicitud.body);
+>>>>>>> origin/master
   var mostrarPerfil=db.query('SELECT *FROM Usuario WHERE id_Usuario=?',[solicitud.body.id_Usuario],function(error,res){
     if(error){
       console.log(error); 
     }else{   
+<<<<<<< HEAD
       var f=res[0].foto;      
       var f2="data:image/jpeg;base64,"+f.toString();
       res[0].foto=f2;  
+=======
+      //var f=res[0].foto;      
+     // var f2="data:image/jpeg;base64,"+f.toString();
+     // res[0].foto=f2;  
+      console.log(res);
+>>>>>>> origin/master
       respuesta.json(res);
     }
   })

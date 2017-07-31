@@ -91,7 +91,10 @@ app.controller( 'loginController', function($scope, $http,$state) {
 })
 .controller('denuncias_usuariosController',function($scope, $http,$state){
     $scope.mensajeDU="";
+<<<<<<< HEAD
     var id_D;
+=======
+>>>>>>> origin/master
     $scope.cargarDenuncias=function(){
         $http.get('/admin/listaUsuariosDenunciados')
                 .then(function(data) {                
@@ -113,16 +116,26 @@ app.controller( 'loginController', function($scope, $http,$state) {
                     console.log('Error:' + data);
                 });
     };
+<<<<<<< HEAD
     $scope.mostrarPerfil=function(id_Usuario,denunciaUsuario,id_Denuncia){
         id_D=id_Denuncia;
+=======
+    $scope.mostrarPerfil=function(id_Usuario,denunciaUsuario){
+>>>>>>> origin/master
         $scope.denuncia=denunciaUsuario;
         $http.post('/admin/mostrar_perfil',{id_Usuario})
             .then(function(data) {                
                 $scope.datosUsuario=data['data'][0];
+<<<<<<< HEAD
+=======
+                console.log(data);
+                alert($scope.datosUsuario.cedula);
+>>>>>>> origin/master
             })
             .catch(function(data) {                
                     console.log('Error:' + data);
                 });
+<<<<<<< HEAD
     };               
     $scope.desactivarUsuario=function(id){
         $http.put('/admin/inactivarDenuncia',{id,id_D})
@@ -135,6 +148,9 @@ app.controller( 'loginController', function($scope, $http,$state) {
                     console.log('Error:' + data);
                 });
     };                                              
+=======
+    };                                      
+>>>>>>> origin/master
 })
 .controller('denuncias_publicacionesController',function($scope, $http,$state){
     $scope.cargarDenunciasPublicaciones=function(){

@@ -20,7 +20,11 @@
                                     <tr ng-repeat="usuario in listaUsuariosDenunciados" >
                                         <td>{{usuario.descripcion}}</td>
                                         <td><a ng-click="omitirDenucia(usuario.id_Denuncia)">Omitir</a>                                    
+<<<<<<< HEAD
                                         <a ng-click="mostrarPerfil(usuario.id_UsuarioD,usuario.descripcion,usuario.id_Denuncia)" data-toggle="modal" data-target="#perfil">Ver perfil</a>                                        
+=======
+                                        <a ng-click="mostrarPerfil(usuario.id_UsuarioD,usuario.descripcion)" data-toggle="modal" data-target="#perfil">Ver perfil</a>                                        
+>>>>>>> origin/master
                                         </td>                                        
                                     </tr>                                    
                                 </tbody>
@@ -37,6 +41,7 @@
         <h4 class="modal-title"><span style="color:brown;">Razon Denuncia: </span>{{denuncia}}</h4>
       </div>
       <div class="modal-body">
+<<<<<<< HEAD
         <h5 style="color:brown;">Nombres y apellidos </h5>
         <span>{{ datosUsuario.nombres}}</span>
         
@@ -55,6 +60,12 @@
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal" ng-click="desactivarUsuario(datosUsuario.id_Usuario)">Desactivar</a>
+=======
+        <span style="color:brown;">Cedula </span>
+        {{ datosUsuario.cedula}}
+      </div>
+      <div class="modal-footer">
+>>>>>>> origin/master
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
