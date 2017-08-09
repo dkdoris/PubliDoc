@@ -14,11 +14,11 @@ router.get('/', function(req, res, next) {
 //Se envia el resultado de la consulta a la aplicacion los datos id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento para mostrar la lista de publicaciones
 
 router.post('/listaAnuncios', function(solicitud, respuesta, next) { 
-  var mostrarLista=db.query("SELECT id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento,id_Usuario from Publicacion where borrado_Logico=? and numero_Documento=?",[0,solicitud.body.cedulatenporal],function(error,resBD,filas){
+  var mostrarLista=db.query("SELECT id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento,id_Usuario,revision from Publicacion where borrado_Logico=? and numero_Documento=? and revision=1",[0,solicitud.body.cedulatenporal],function(error,resBD,filas){
     if(error){
       console.log(error);
     }else{
-
+      //console.log(resBD[0]['revision']);
       respuesta.json(resBD);   //terminar la peticion 
   } 
   })

@@ -27,7 +27,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
             url: '/gestion de usuarios',
             templateUrl : "view/denuncias_publicaciones.html",
             controller:"denuncias_publicacionesController"
-        }) 
+        })
+        .state('principal.gestion_publicacion', {
+            url: '/gestion de publicación',
+            templateUrl : "view/gestion_publicacion.html",
+            controller:"gestion_publicaionController"
+        })
+         
 });
 
 app.controller( 'loginController', function($scope, $http,$state) {      
@@ -47,7 +53,77 @@ app.controller( 'loginController', function($scope, $http,$state) {
             });
     };
 })
+app.controller( 'gestion_publicaionController', function($scope, $http,$state) {      
+    $scope.mensajeP="";
+    $scope.listarPublicaciones=function(){
+     $http.get('/admin/listarPublicaciones')
+            .then(function(data) {            
+                $scope.listaPublicaciones=data['data'];
+            })
+            .catch(function(data) {                
+                console.log('Error:' + data);
+            });
+    }
+    $scope.listarPublicaciones();
+    $scope.verPublicacion=function(id_PublicacionD){
+        $http.post('/admin/mostrarPublicacion',{id_PublicacionD})
+                .then(function(data) {              
+                    $scope.datosPublicacion=data['data'][0];
+                    if(data['data'][0]['fecha_Encuentro']!=null){
+                        var todayTime  = new Date(data['data'][0]['fecha_Encuentro']);
+                        var month = todayTime.getMonth() + 1;
+                        var day = todayTime.getDate();
+                        var year = todayTime.getFullYear();
+                        var fecha=year + "/" + month + "/" + day;   
+                        $scope.datosPublicacion.fecha_Encuentro=fecha;
+                    } 
+                    if(data['data'][0]['fecha_Perdida']!=null){
+                        var todayTime  = new Date(data['data'][0]['fecha_Perdida']);
+                        var month = todayTime.getMonth() + 1;
+                        var day = todayTime.getDate();
+                        var year = todayTime.getFullYear();
+                        var fecha=year + "/" + month + "/" + day;   
+                        $scope.datosPublicacion.fecha_Perdida=fecha;
+                    }                    
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+                });        
+    }
+    $scope.publicar=function(id_Publicacion,variable){
+        var razon="";
+        if(variable==2){
+            razon = prompt("¿Escriba la razon de porque esta publicación va a ser negada?", "");
+            if (razon != null){
+                $http.put('/admin/actualizarPublicacion',{variable,id_Publicacion,razon})
+                .then(function(data) {              
+                            $scope.mensajeP="La publicación fue denegada";                        
+                    
+                    $scope.listarPublicaciones();
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+                });             
+            }else {
+                alert("Para realizar esta operación se debe ingresar la razón");
+            }   
+        }else{
+            $http.put('/admin/actualizarPublicacion',{variable,id_Publicacion,razon})
+                .then(function(data) {              
+                    $scope.mensajeP="La publicación fue aceptada";                        
+                    $scope.listarPublicaciones();
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+            });  
+        }
+    }   
+    
+})
 .controller('principalController',function($scope, $http,$state){
+    /*$scope.cerrarSesion=function(){
+
+    }*/
 })
 .controller('gestion_usuariosController',function($scope, $http,$state){  
     $scope.mensaje="";
@@ -55,6 +131,7 @@ app.controller( 'loginController', function($scope, $http,$state) {
      $http.get('/admin/listaUsuarios')
             .then(function(data) {            
               $scope.listaUsuarios=data['data'];
+              $scope.mensaje="";
             })
             .catch(function(data) {                
                 console.log('Error:' + data);
@@ -96,6 +173,7 @@ app.controller( 'loginController', function($scope, $http,$state) {
         $http.get('/admin/listaUsuariosDenunciados')
                 .then(function(data) {                
                 $scope.listaUsuariosDenunciados=data['data'];
+                $scope.mensajeDU="";
                 })
                 .catch(function(data) {                
                     console.log('Error:' + data);
@@ -137,10 +215,13 @@ app.controller( 'loginController', function($scope, $http,$state) {
     };                                              
 })
 .controller('denuncias_publicacionesController',function($scope, $http,$state){
+    $scope.mensajeDP="";
+    var id_D;
     $scope.cargarDenunciasPublicaciones=function(){
         $http.get('/admin/listaPublicacionesDenunciadas')
                 .then(function(data) {                
                 $scope.listaPublicacionesDenunciadas=data['data'];
+                $scope.mensajeDP="";
                 })
                 .catch(function(data) {                
                     console.log('Error:' + data);
@@ -158,5 +239,49 @@ app.controller( 'loginController', function($scope, $http,$state) {
                     console.log('Error:' + data);
                 });
     }; 
+    $scope.verPublicacion=function(descripcionDenuncia,id_PublicacionD,id_Denuncia){
+        $scope.denuncia=descripcionDenuncia;
+        id_D=id_Denuncia;
+        $http.post('/admin/mostrarPublicacion',{id_PublicacionD})
+                .then(function(data) {              
+                    $scope.datosPublicacion=data['data'][0];
+                    if(data['data'][0]['fecha_Encuentro']!=null){
+                        var todayTime  = new Date(data['data'][0]['fecha_Encuentro']);
+                        var month = todayTime.getMonth() + 1;
+                        var day = todayTime.getDate();
+                        var year = todayTime.getFullYear();
+                        var fecha=year + "/" + month + "/" + day;   
+                        $scope.datosPublicacion.fecha_Encuentro=fecha;
+                    } 
+                    if(data['data'][0]['fecha_Perdida']!=null){
+                        var todayTime  = new Date(data['data'][0]['fecha_Perdida']);
+                        var month = todayTime.getMonth() + 1;
+                        var day = todayTime.getDate();
+                        var year = todayTime.getFullYear();
+                        var fecha=year + "/" + month + "/" + day;   
+                        $scope.datosPublicacion.fecha_Perdida=fecha;
+                    }                    
+                    //$scope.mensajeDP="La publicación se dio de baja ";
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+                });
+    }
+    $scope.desactivarPublicacion=function(id_Publicacion){
+        var razon = prompt("¿Escriba la razon de porque esta publicación va a ser negada?", "");
+            if (razon != null){
+                $http.put('/admin/inactivarPublicacion',{id_Publicacion,id_D,razon})
+                    .then(function(data) {  
+                        $scope.mensajeDP="La publicación se dio de baja ";            
+                        $scope.cargarDenunciasPublicaciones();                    
+                    })
+                    .catch(function(data) {                
+                        console.log('Error:' + data);
+                    });            
+            }else {
+                alert("Para realizar esta operación se debe ingresar la razón");
+            }
+
+    }    
     
 })

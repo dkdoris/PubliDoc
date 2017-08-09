@@ -74,7 +74,7 @@ console.log("Se conecto el socket");
 //********************Mostrar lista de mensajes***********************//
 //Realiza una consulta para seleccionar la lista de mensajes a ser mostrados
 router.post('/listaMensajes', function(solicitud, respuesta, next) {
-    var listaMensajes=db.query("SELECT u.id_Usuario,c.id_Conversacion,u.nombres, u.foto FROM Conversacion c, Usuario u WHERE CASE WHEN c.id_Usuario1 = ? THEN c.id_Usuario2 = u.id_Usuario WHEN c.id_Usuario2 = ? THEN c.id_Usuario1= u.id_Usuario END  AND (c.id_Usuario1 =? OR c.id_Usuario2 =?) AND (c.borrado_Logico!=? and c.borrado_Logico!=?)",[solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,-1,solicitud.body.id_Usuario],function(error,resBD,filas){
+    var listaMensajes=db.query("SELECT u.id_Usuario,c.id_Conversacion,u.nombres, u.foto,c.inicio_Conversacion FROM Conversacion c, Usuario u WHERE CASE WHEN c.id_Usuario1 = ? THEN c.id_Usuario2 = u.id_Usuario WHEN c.id_Usuario2 = ? THEN c.id_Usuario1= u.id_Usuario END  AND (c.id_Usuario1 =? OR c.id_Usuario2 =?) AND (c.borrado_Logico!=? and c.borrado_Logico!=?)",[solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,solicitud.body.id_Usuario,-1,solicitud.body.id_Usuario],function(error,resBD,filas){
     if(error){
         console.log(error);
     }else{ 

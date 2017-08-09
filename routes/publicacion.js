@@ -58,6 +58,7 @@ var sendNotificationToUser=function(token,message) {
 //a la tabla de publicacion luego recorro el arreglo id_Documento para guardar en la tabla Publicacion_Documento cada id_Docuemento seleccionado por el usuario
 router.post('/crearPublicacionE', function(solicitud, respuesta, next) {
   var ms = Date.parse(solicitud.body.fecha_Encuentro);
+  var razon="";
   var todayTime  = new Date(solicitud.body.fecha_Encuentro);
   var month = todayTime.getMonth() + 1;
   var day = todayTime.getDate();
@@ -70,7 +71,7 @@ router.post('/crearPublicacionE', function(solicitud, respuesta, next) {
         console.log(error);
       }else{
         if(respuestaBD!=""){
-          var crearPublicacionE=db.query('INSERT INTO Publicacion(fecha_Publicacion,fecha_Encuentro,ubicacion_Encuentro,lugar_Reside,detalles,foto,borrado_Logico,id_Usuario,tipo_Publicacion,numero_Documento, latitud, longitud,latitud_Reside,longitud_Reside) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [fechaP,fecha,solicitud.body.ubicacion_Encuentro,solicitud.body.lugar_Reside,solicitud.body.detalles,solicitud.body.foto,0,solicitud.body.id_Usuario,solicitud.body.tipo_Publicacion,solicitud.body.numero_Documento,solicitud.body.latitud, solicitud.body.longitud,solicitud.body.latitud_Reside,solicitud.body.longitud_Reside],function(error,res,filas){
+          var crearPublicacionE=db.query('INSERT INTO Publicacion(fecha_Publicacion,fecha_Encuentro,ubicacion_Encuentro,lugar_Reside,detalles,foto,borrado_Logico,id_Usuario,tipo_Publicacion,numero_Documento, latitud, longitud,latitud_Reside,longitud_Reside,revision,razon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [fechaP,fecha,solicitud.body.ubicacion_Encuentro,solicitud.body.lugar_Reside,solicitud.body.detalles,solicitud.body.foto,0,solicitud.body.id_Usuario,solicitud.body.tipo_Publicacion,solicitud.body.numero_Documento,solicitud.body.latitud, solicitud.body.longitud,solicitud.body.latitud_Reside,solicitud.body.longitud_Reside,0,razon],function(error,res,filas){
             if(error){
                 console.log(error);
             }else{
@@ -115,6 +116,7 @@ router.post('/crearPublicacionE', function(solicitud, respuesta, next) {
 //Primero se ingresa los datos fecha_Publicacion,fecha_Perdida,ubicacion_Perdida,detalles,borrado_Logico,id_Usuario,tipo_Publicacion,numero_Documento
 //a la tabla de publicacion luego recorro el arreglo id_Documento para guardar en la tabla Publicacion_Documento cada id_Docuemento seleccionado por el usuario
 router.post('/crearPublicacionP', function(solicitud, respuesta, next) {
+  var razon="";
     var ms = Date.parse(solicitud.body.fecha_Perdida);
     var todayTime  = new Date(solicitud.body.fecha_Perdida);
     var month = todayTime.getMonth() + 1;
@@ -122,7 +124,7 @@ router.post('/crearPublicacionP', function(solicitud, respuesta, next) {
     var year = todayTime.getFullYear();
     var fecha=year + "/" + month + "/" + day; 
     var fechaP = new Date();    
-var crearPublicacionP=db.query('INSERT INTO Publicacion(fecha_Publicacion,fecha_Perdida,ubicacion_Perdida,detalles,borrado_Logico,id_Usuario,tipo_Publicacion,numero_Documento,latitud, longitud) VALUES(?,?,?,?,?,?,?,?,?,?)', [fechaP,fecha,solicitud.body.ubicacion_Perdida,solicitud.body.detalles,0,solicitud.body.id_Usuario,solicitud.body.tipo_Publicacion,solicitud.body.numero_Documento,solicitud.body.latitud, solicitud.body.longitud],function(error,res,filas){
+  var crearPublicacionP=db.query('INSERT INTO Publicacion(fecha_Publicacion,fecha_Perdida,ubicacion_Perdida,detalles,borrado_Logico,id_Usuario,tipo_Publicacion,numero_Documento,latitud, longitud,revision,razon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', [fechaP,fecha,solicitud.body.ubicacion_Perdida,solicitud.body.detalles,0,solicitud.body.id_Usuario,solicitud.body.tipo_Publicacion,solicitud.body.numero_Documento,solicitud.body.latitud, solicitud.body.longitud,0,razon],function(error,res,filas){
     if(error){
       console.log(error);
    }else{
@@ -161,7 +163,7 @@ var crearPublicacionP=db.query('INSERT INTO Publicacion(fecha_Publicacion,fecha_
 //Se envia el resultado de la consulta a la aplicacion los datos id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento para mostrar la lista de publicaciones
 router.post('/listaPublicacion', function(solicitud, respuesta, next) { 
       
-  var mostrarLista=db.query("SELECT Publicacion.id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento,id_Usuario from Publicacion where Publicacion.id_Usuario=? and Publicacion.borrado_Logico=?",[solicitud.body.idIdentificacion,0],function(error,resBD,filas){
+  var mostrarLista=db.query("SELECT Publicacion.id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento,id_Usuario,revision from Publicacion where Publicacion.id_Usuario=? and Publicacion.borrado_Logico=?",[solicitud.body.idIdentificacion,0],function(error,resBD,filas){
     if(error){
       console.log(error);
     }else{
@@ -175,6 +177,7 @@ router.post('/listaPublicacion', function(solicitud, respuesta, next) {
 //Después se elimina de la tabla Publicacion_Documento los registros que involucran el id_Publicacion de la publicacion seleccionada
 //Posteriormente se inserta el id_Publicacion,id_Documento[i] en la tabla Publicacion_Documento para terminar la modificacion de la publicacion de encuentro
 router.put('/modificarPublicacionE', function(solicitud, respuesta, next) {
+  var razon="";
   var ms = Date.parse(solicitud.body.fecha_Encuentro);
   var todayTime  = new Date(solicitud.body.fecha_Encuentro);
   var month = todayTime.getMonth() + 1;
@@ -182,7 +185,7 @@ router.put('/modificarPublicacionE', function(solicitud, respuesta, next) {
   var year = todayTime.getFullYear();
   var fecha=year + "/" + month + "/" + day; 
 
-      var modificarPublicacionE=db.query('UPDATE Publicacion SET fecha_Encuentro=?, ubicacion_Encuentro=?,lugar_Reside=?,detalles=?,foto=?,numero_Documento=? , latitud=?, longitud=?, latitud_Reside=?, longitud_Reside=? WHERE id_Publicacion=?', [fecha,solicitud.body.ubicacion_Encuentro,solicitud.body.lugar_Reside,solicitud.body.detalles,solicitud.body.foto,solicitud.body.numero_Documento,solicitud.body.latitud, solicitud.body.longitud,solicitud.body.latitud_Reside,solicitud.body.longitud_Reside,solicitud.body.id_Publicacion],function(error,resBD,filas){
+      var modificarPublicacionE=db.query('UPDATE Publicacion SET fecha_Encuentro=?, ubicacion_Encuentro=?,lugar_Reside=?,detalles=?,foto=?,numero_Documento=? , latitud=?, longitud=?, latitud_Reside=?, longitud_Reside=?, revision=?,razon=? WHERE id_Publicacion=?', [fecha,solicitud.body.ubicacion_Encuentro,solicitud.body.lugar_Reside,solicitud.body.detalles,solicitud.body.foto,solicitud.body.numero_Documento,solicitud.body.latitud, solicitud.body.longitud,solicitud.body.latitud_Reside,solicitud.body.longitud_Reside,0,razon,solicitud.body.id_Publicacion],function(error,resBD,filas){
         if(error){
           console.log(error);
         }else{
@@ -214,13 +217,14 @@ router.put('/modificarPublicacionE', function(solicitud, respuesta, next) {
 //Después se elimina de la tabla Publicacion_Documento los registros que involucran el id_Publicacion de la publicacion seleccionada
 //Posteriormente se inserta el id_Publicacion,id_Documento[i] en la tabla Publicacion_Documento para terminar la modificacion de la publicacion de perdida
 router.put('/modificarPublicacionP', function(solicitud, respuesta, next) {
+  var razon="";
   var ms = Date.parse(solicitud.body.fecha_Perdida);
   var todayTime  = new Date(solicitud.body.fecha_Perdida);
   var month = todayTime.getMonth() + 1;
   var day = todayTime.getDate();
   var year = todayTime.getFullYear();
   var fecha=year + "/" + month + "/" + day; 
-  var modificarPublicacionE=db.query('UPDATE Publicacion SET fecha_Perdida=?,ubicacion_Perdida=?,detalles=?,numero_Documento=?, latitud=?, longitud=? WHERE id_Publicacion=?', [fecha,solicitud.body.ubicacion_Perdida,solicitud.body.detalles,solicitud.body.numero_Documento,solicitud.body.latitud,solicitud.body.longitud,solicitud.body.id_Publicacion],function(error,resBD,filas){
+  var modificarPublicacionE=db.query('UPDATE Publicacion SET fecha_Perdida=?,ubicacion_Perdida=?,detalles=?,numero_Documento=?, latitud=?, longitud=?, revision=?,razon=? WHERE id_Publicacion=?', [fecha,solicitud.body.ubicacion_Perdida,solicitud.body.detalles,solicitud.body.numero_Documento,solicitud.body.latitud,solicitud.body.longitud,0,razon,solicitud.body.id_Publicacion],function(error,resBD,filas){
     if(error){
       console.log(error);
   }else{
@@ -254,7 +258,7 @@ router.put('/modificarPublicacionP', function(solicitud, respuesta, next) {
 //Y que el borrado logico de la publicación tenga el valor de cero para poder presentarla 
 //De la tabla de Publicacion_Documento se ve si el id_Publicacion sea igual al id de publicacion ingersado y el id_Documento de esta tabla sea igual al id_Documento de la tabla Documento
 router.post('/mostrarPublicacionE', function(solicitud, respuesta, next) { 
-  var mostrarPublicacionE=db.query("SELECT Publicacion.id_Publicacion,tipo_Publicacion, latitud, longitud,latitud_Reside,longitud_Reside, fecha_Publicacion,fecha_Encuentro,ubicacion_Encuentro,lugar_Reside,detalles,foto,numero_Documento,id_Usuario,Publicacion_Documento.id_Documento,nombre_Documento from Publicacion,Publicacion_Documento,Documento where Publicacion.id_Publicacion=? and Publicacion.id_Usuario=? and Publicacion.borrado_Logico=? and Publicacion_Documento.id_Publicacion=Publicacion.id_Publicacion and Publicacion_Documento.id_Documento=Documento.id_Documento",[solicitud.body.idIdentificacionP,solicitud.body.idIdentificacion,0],function(error,resBD,filas){
+  var mostrarPublicacionE=db.query("SELECT Publicacion.id_Publicacion,tipo_Publicacion, latitud, longitud,latitud_Reside,longitud_Reside,razon, fecha_Publicacion,fecha_Encuentro,ubicacion_Encuentro,lugar_Reside,detalles,foto,numero_Documento,id_Usuario,Publicacion_Documento.id_Documento,nombre_Documento,revision from Publicacion,Publicacion_Documento,Documento where Publicacion.id_Publicacion=? and Publicacion.id_Usuario=? and Publicacion.borrado_Logico=? and Publicacion_Documento.id_Publicacion=Publicacion.id_Publicacion and Publicacion_Documento.id_Documento=Documento.id_Documento",[solicitud.body.idIdentificacionP,solicitud.body.idIdentificacion,0],function(error,resBD,filas){
     if(error){
       console.log(error);
     }else{
@@ -272,7 +276,7 @@ router.post('/mostrarPublicacionE', function(solicitud, respuesta, next) {
 //Y que el borrado logico de la publicación tenga el valor de cero para poder presentarla 
 //De la tabla de Publicacion_Documento se ve si el id_Publicacion sea igual al id de publicacion ingersado y el id_Documento de esta tabla sea igual al id_Documento de la tabla Documento
 router.post('/mostrarPublicacionP', function(solicitud, respuesta, next) { 
-  var mostrarUsuario=db.query("SELECT Publicacion.id_Publicacion,tipo_Publicacion,fecha_Publicacion,latitud,longitud,fecha_Perdida,ubicacion_Perdida,detalles,numero_Documento,id_Usuario,Publicacion_Documento.id_Documento,nombre_Documento from Publicacion,Publicacion_Documento,Documento where Publicacion.id_Publicacion=? and Publicacion.id_Usuario=? and Publicacion.borrado_Logico=? and Publicacion_Documento.id_Publicacion=Publicacion.id_Publicacion and Publicacion_Documento.id_Documento=Documento.id_Documento",[solicitud.body.idIdentificacionP,solicitud.body.idIdentificacion,0],function(error,resBD,filas){
+  var mostrarUsuario=db.query("SELECT Publicacion.id_Publicacion,tipo_Publicacion,fecha_Publicacion,latitud,longitud,fecha_Perdida,razon,ubicacion_Perdida,detalles,numero_Documento,id_Usuario,Publicacion_Documento.id_Documento,nombre_Documento,revision from Publicacion,Publicacion_Documento,Documento where Publicacion.id_Publicacion=? and Publicacion.id_Usuario=? and Publicacion.borrado_Logico=? and Publicacion_Documento.id_Publicacion=Publicacion.id_Publicacion and Publicacion_Documento.id_Documento=Documento.id_Documento",[solicitud.body.idIdentificacionP,solicitud.body.idIdentificacion,0],function(error,resBD,filas){
     if(error){
         console.log(error);
     }else{      
