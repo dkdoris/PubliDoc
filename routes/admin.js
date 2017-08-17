@@ -243,6 +243,16 @@ router.post('/cerrar_session', function(req, res, next) {
   //res.redirect(200,'../');
   res.json("isajiasj");
 });
+router.get('/verificarSesion', function(solicitud, respuesta, next) {
+  //console.log("cerrar_session");
+ // console.log(req.body.datos.nombres);
+ console.log(solicitud.session.nombre);
+  if (solicitud.session.nombre&&solicitud.session.id) {
+    respuesta.json("0");
+  }else{
+    respuesta.json("1");
+  }
+});
 
 return router;
 }

@@ -142,11 +142,24 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
     
 })
 .controller('principalController',function($scope, $http,$state,datosUser){
+    $scope.verificarSesion=function(){
+             $http.get('/admin/verificarSesion')
+            .then(function(data) { 
+                if (data['data']=="1") {
+                    $state.go("login");
+                }                
+            })
+            .catch(function(data) {                
+                console.log('Error:' + data);
+            });
+    }
+    $scope.verificarSesion();
     $scope.cerrarSesion=function(){
        //alert("Entre");
   //      window.history.forward();
          //   var nombre=datosUser.user['nombres'];
            // var id=datosUser.user['id_Usuario'];
+
             var datos=datosUser.user;
              $http.post('/admin/cerrar_session',{datos})
             .then(function(data) {            
