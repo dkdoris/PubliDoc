@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('servidor:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+app.io.listen(server);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+
+
+/*
+var io=require('socket.io').listen(server);
+
+
+//users=[];
+connections=[];
+
+
+io.sockets.on('connection',function(socket){
+
+console.log("Se conecto el socket %",connections.length);
+    //  
+    socket.on('userconection',function(data){
+    var aux={'id':data,'socket_id':socket.id};
+    console.log("Se conecto el usuario"+ socket.id);
+    connections.push(aux);
+  });
+    
+  
+  socket.on('disconnect',function(data){    
+  connections.splice(connections.indexOf(socket),1);
+    console.log('Descenectado % ',connections.length);
+  });
+
+  socket.on('send message', function(data){
+//    console.log(data);  
+
+//envia los mensajes
+              connections.forEach(function(u){    
+                if(u.id==data.id_Usuario2){ 
+                    console.log(u.socket_id);//
+                    //enviar a la persona que debe llegar el mensaje
+                  io.to(u.socket_id).emit('new message',{data.message});
+              }
+              });
+
+
+
+});
+
+
+ */ 

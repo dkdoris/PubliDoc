@@ -1,0 +1,76 @@
+<div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Denuncias Publicaciones</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+<div style="float:right; padding-right:13px;">
+    <span style="color:red;">{{mensajeDP}}</span>
+</div>                
+</div>
+
+<div>  
+    <table datatable="ng" class="table" width="100%" >
+                                <thead>
+                                    <tr>
+                                        <th>Descripcion</th>
+                                        <th>Opciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="odd gradeX" ng-repeat="publicacion in listaPublicacionesDenunciadas" >
+                                        <td>{{publicacion.descripcion}}</td>
+                                        <td><a ng-click="omitirDenucia(publicacion.id_Denuncia)">Omitir</a>                                    
+                                        <a ng-click="verPublicacion(publicacion.descripcion,publicacion.id_PublicacionD,publicacion.id_Denuncia)" data-toggle="modal" data-target="#publicacion">Ver publicacion</a>                                        
+                                        </td>                                        
+                                    </tr>                                    
+                                </tbody>
+                            </table>        
+    </div>
+<!-- Modal -->
+<div id="publicacion" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span style="color:brown;">Razon Denuncia: </span>{{denuncia}}</h4>
+      </div>
+      <div class="modal-body">
+        <h5 style="color:brown;">Numero de Documento </h5>
+        <span>{{ datosPublicacion.numero_Documento}}</span>
+        
+        <h5 style="color:brown;">Tipo de publicación </h5>
+        <span>{{ datosPublicacion.tipo_Publicacion}}</span>
+        <br/>
+        <div ng-if="datosPublicacion.tipo_Publicacion==='Encuentro'">
+            <div style="text-align:center;">
+            <img ng-show="datosPublicacion.foto !== undefined" ng-src="{{datosPublicacion.foto}}">
+            </div>        
+            <h5 style="color:brown;">Fecha de Encuentro </h5>
+            <span> {{  datosPublicacion.fecha_Encuentro}}</span>
+            <h5 style="color:brown;"></h5>
+            <span> {{  datosPublicacion.email}}</span>
+            <h5 style="color:brown;"> Ubicacion de encuentro</h5>
+            <span> {{  datosPublicacion.ubicacion_Encuentro}}</span>
+            <h5 style="color:brown;"> Lugar donde reside</h5>
+            <span> {{  datosPublicacion.lugar_Reside}}</span>
+        </div>
+        <div ng-if="datosPublicacion.tipo_Publicacion==='Perdida'">
+            <h5 style="color:brown;">Fecha de Perdida </h5>
+            <span> {{  datosPublicacion.fecha_Perdida}}</span>
+            <h5 style="color:brown;">Ubicacion de Perdida </h5>
+            <span> {{  datosPublicacion.ubicacion_Perdida}}</span>
+        </div>    
+        <h5 style="color:brown;"> Detalles</h5>
+        <span> {{  datosPublicacion.detalles}}</span>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal" ng-click="desactivarPublicacion(datosPublicacion.id_Publicacion)">Desactivar</a>        
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>    
+         

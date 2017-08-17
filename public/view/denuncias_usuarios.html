@@ -1,0 +1,63 @@
+<div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Denuncias Usuarios</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+<div style="float:right; padding-right:13px;">
+    <span style="color:red;">{{mensajeDU}}</span>
+</div>                
+</div>
+
+<div>  
+    <table datatable="ng" class="table" width="100%" >
+                                <thead>
+                                    <tr>
+                                        <th>Descripción</th>
+                                        <th>Opciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="usuario in listaUsuariosDenunciados" >
+                                        <td>{{usuario.descripcion}}</td>
+                                        <td><a ng-click="omitirDenucia(usuario.id_Denuncia)">Omitir</a>                                    
+                                        <a ng-click="mostrarPerfil(usuario.id_UsuarioD,usuario.descripcion,usuario.id_Denuncia)" data-toggle="modal" data-target="#perfil">Ver perfil</a>                                        
+                                        </td>                                        
+                                    </tr>                                    
+                                </tbody>
+                            </table>        
+    </div>
+<!-- Modal -->
+<div id="perfil" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"><span style="color:brown;">Razon Denuncia: </span>{{denuncia}}</h4>
+      </div>
+      <div class="modal-body">
+        <h5 style="color:brown;">Nombres y apellidos </h5>
+        <span>{{ datosUsuario.nombres}}</span>
+        
+        <h5 style="color:brown;">Cédula </h5>
+        <span>{{ datosUsuario.cedula}}</span>
+        <br/>
+        <div style="text-align:center;">
+            <img ng-show="datosUsuario.foto !== undefined" ng-src="{{datosUsuario.foto}}">
+        </div>        
+        <h5 style="color:brown;">Celular </h5>
+        <span> {{  datosUsuario.celular}}</span>
+        <h5 style="color:brown;">E-mail</h5>
+        <span> {{  datosUsuario.email}}</span>
+        <h5 style="color:brown;"> Link Facebook</h5>
+        <span> {{  datosUsuario.link_Facebook}}</span>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal" ng-click="desactivarUsuario(datosUsuario.id_Usuario)">Desactivar</a>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>                                   
