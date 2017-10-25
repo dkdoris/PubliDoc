@@ -1,20 +1,25 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">Gestion Usuarios</h1>
+        <div style="float:left;">
+            <h1 class="page-header">Gestion Usuarios</h1>
+        </div>
+        
+        <div style="float:right; padding-right:13px;">
+            <span style="color:red;">{{mensaje}}</span>
+        </div> 
     </div>
-                <!-- /.col-lg-12 -->    
-<div style="float:right; padding-right:13px;">
-    <span style="color:red;">{{mensaje}}</span>
-</div>                
+                <!-- /.col-lg-12 -->                   
 </div>
 
 <div>  
+    <button class="btn btn-success" style="float:right; padding-right:13px; margin-bottom:13px;" data-toggle="modal" data-target="#crearU">Crear Usuario</button>
     <table  datatable="ng" class="table" width="100%"  id="dataTables-example">
                                 <thead>
                                     <tr>
                                         <th>Cédula</th>
                                         <th>Nombres</th>
+                                        <th>Tipo</th>
                                         <th>Estado</th>
                                         <th>Opciones</th>
                                     </tr>
@@ -25,6 +30,7 @@
                                         <td>{{usuario.cedula}}</td>
                                         <td ng-if="usuario.borrado_Logico===0">Activo</td>
                                         <td ng-if="usuario.borrado_Logico===1">Inactivo</td>
+                                        <td>{{usuario.tipo}}</td>
                                         <td><a ng-click="desactivar(usuario.id_Usuario)">Act/Desc</a>                                    
                                         <a ng-click="restaurarContrasena(usuario.id_Usuario,usuario.cedula)">Restaurar Contraseña</a>                                        
                                         </td>                                        
@@ -33,3 +39,58 @@
                             </table>        
     </div>
             
+            <!-- Modal -->
+<div id="crearU" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 style="font-width:bold;">Crear usuario</h3>
+      </div>
+      <div class="modal-body">
+        <form class="list ">
+            Cédula
+            <input placeholder="Ingrese número de cédula" ng-model="usuario.cedula" ng-keyup="">
+            <label ng-hide="cedulaValida">Cédula incorrecta</label>
+            <br>
+            Nombres y apellidos
+            <input placeholder="Ingrese número de cédula">
+            <br>
+            Fecha de nacimiento
+            <input placeholder="Ingresar fecha de nacimiento">
+            <br>
+            Contraseña
+            <input placeholder="Ingrese la contraseña" ng-model="usuario.contrasena">
+            <br>
+            Email
+            <input placeholder="Ingrese email" ng-model="usuario.email">   
+            <br>         
+            Celular
+            <input placeholder="Ingrese el número de celular" ng-model="usuario.celular">
+            <br>
+            Link facebook
+            <input placeholder="Ingrese el lin de facebook" ng-model="usuario.link_Facebook">
+            <br>
+            Foto
+            <!--<input type="file" name="img" accept=".jpg, .jpeg, .png">-->
+            <div id="divInputLoad">
+                <div id="divFileUpload" style="with:20%">
+                    <input id="file-upload" type="file" accept="image/*" />
+                </div>
+                <div id="file-preview-zone">
+                </div>
+            </div>
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal" ng-click="crearUsuario()">Crear</a>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>    

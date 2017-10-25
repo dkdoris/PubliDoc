@@ -21,12 +21,28 @@ router.get('/', function(req, res, next) {
 //realiza una consulta a la base de datos para saber si los datos (cedula y contraseña) ingresados por el usuario pertenecen a alguna cuenta
 router.post('/iniciarsession', function(solicitud, respuesta, next) {
 
-  var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=?",[solicitud.body.cedula,solicitud.body.contrasena,0],function(error,columnas,filas){
+  var iniciarsession=db.query("SELECT *FROM Usuario,Rol_Usuario WHERE cedula=? and contrasena=? and id_Rol=? and Rol_Usuario.id_Usuario=Usuario.id_Usuario",[solicitud.body.cedula,solicitud.body.contrasena,3],function(error,columnas,filas){
       if(error){
         console.log(error);
     }else{
-      //devuelve la respuesta json el servidor
-        respuesta.json(columnas);
+     /* if(columnas!=""){
+        var tipoUsuario=db.query("SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol=?",[columnas[0]['id_Usuario'],3],function(error,resBD,filas){
+          if(error){
+            console.log(error);
+          }else{ 
+            respuesta.json(columnas);   //terminar la peticion 
+          }  
+       
+        })
+      }else{*/
+        if (columnas!="") {
+          respuesta.json(columnas);
+        }else{
+          respuesta.json("-1");
+        }
+
+      
+      //devuelve la respuesta json el servidor        
     } 
   })
 });
@@ -67,35 +83,59 @@ router.post('/mostrarUsuario', function(solicitud, respuesta, next) {
 //en caso de que estos datos cohincidan con una cuenta no se podra crear una cuenta de lo contrario
 //se ingresaran los datos cedula,nombres,apellidos,contrasena,fecha_Nacimiento,email,celular,link_Facebook,borrado_Logico,calificacion_Total a la base de datos para crear la cuenta
 router.post('/crearUsuario', function(solicitud, respuesta, next) {
-  //console.log(solicitud.body);
+  console.log(solicitud.body);
   var ms = Date.parse(solicitud.body.fecha_Nacimiento);
   var todayTime  = new Date(solicitud.body.fecha_Nacimiento);
   var month = todayTime.getMonth() + 1;
   var day = todayTime.getDate();
   var year = todayTime.getFullYear();
   var fecha=year + "/" + month + "/" + day; 
-  var cont=0;
-  var datos=[];
-  var buscarUsuario=db.query('SELECT *FROM Usuario WHERE cedula=? or email=?', [solicitud.body.cedula,solicitud.body.email],function(error,resBD){
-    datos[0]=cont;
+  var datos=0;
+  var buscarUsuario=db.query('SELECT *FROM Usuario WHERE cedula=? or email=?', [solicitud.body.cedula,solicitud.body.email],function(error,resBD){    
     if(error){
       console.log(error);
     }else{
       if (resBD=="") {
-        cont=1;
-        datos[0]=cont;
-        var crearUsuario=db.query('INSERT INTO Usuario(cedula,nombres,contrasena,fecha_Nacimiento,email,celular,link_Facebook,borrado_Logico,calificacion_Total,foto,rol,token) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', [solicitud.body.cedula,solicitud.body.nombres,solicitud.body.contrasena,fecha,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook, 0,0,solicitud.body.foto,solicitud.body.rol,solicitud.body.token],function(error,res){
+  //      datos=-1;
+        var crearUsuario=db.query('INSERT INTO Usuario(cedula,nombres,contrasena,fecha_Nacimiento,email,celular,link_Facebook,calificacion_Total,foto,token) VALUES(?,?,?,?,?,?,?,?,?,?)', [solicitud.body.cedula,solicitud.body.nombres,solicitud.body.contrasena,fecha,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook,0,solicitud.body.foto,solicitud.body.token],function(error,res){
           if(error){
             console.log(error);
-          }else{           
-            datos[1]=res.insertId;
-            //devuelve la respuesta json el servidor
-            respuesta.json(datos);
+          }else{  
+            var crearUsuario=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,res.insertId,0],function(error,res2){
+                if(error){
+                  console.log(error);
+                }else{           
+                  datos=res.insertId;
+                  console.log("No tengo ninguna cuenta");
+                  //devuelve la respuesta json el servidor
+                  respuesta.json(datos);
+                } 
+            })         
           } 
         })
       }else{
-        
-        respuesta.json(datos);
+        var crearUsuario=db.query('SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol!=?', [resBD[0]['id_Usuario'],3],function(error,res1){
+          if(error){
+            console.log(error);
+          }else{  
+            if (res1!="") {
+//              datos=-2;
+              var crearUsuario=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,resBD[0]['id_Usuario'],0],function(error,res2){
+                if(error){
+                  console.log(error);
+                }else{           
+                  datos=resBD[0]['id_Usuario'];
+                  console.log("tengo cuenta de administrador o mediador");
+                  //devuelve la respuesta json el servidor
+                  respuesta.json(datos);
+                } 
+              })
+            }else{
+              console.log("tengo cuenta de usuario");
+              respuesta.json(datos);
+            }        
+          } 
+        })        
       }   
     };
   })
@@ -154,6 +194,7 @@ router.put('/modificarUsuario', function(solicitud, respuesta, next) {
 //En caso de no existir un registro de calificacion se inserta uno para que se el usuario dueño de la cuenta pueda calificar el anuncio del usuario que lo emitio
 //Finalmente envia un gmail (con la informacion email, celular, link_Facebook) al usuario que se puso en contacto con el usuario que emitio el anuncio 
 router.post('/verUsuario', function(solicitud, respuesta, next) { 
+  //Rol_Usuario.borrado_Logico=?
   var verUsuario=db.query("SELECT Usuario.nombres,Usuario.cedula,Usuario.foto,Usuario.email,Usuario.celular,Usuario.link_Facebook,Usuario.id_Usuario from Usuario, Publicacion WHERE Publicacion.id_Publicacion=? and Publicacion.id_Usuario=Usuario.id_Usuario",[solicitud.body.id_Publicacion],function(error,resBD,filas){
     if(error){
       console.log(error); 
@@ -230,7 +271,7 @@ var generarContrasena=function(){
 router.post('/enviarInfoUsuario',function(solicitud,respuesta){
 
     var email=solicitud.body.email;
-    var validarEmail=db.query("SELECT *FROM Usuario WHERE cedula=? and email=? and borrado_Logico=?",[solicitud.body.cedula,email,0],function(error,res,filas){
+    var validarEmail=db.query("SELECT *FROM Usuario,Rol_Usuario WHERE cedula=? and email=? and Rol_Usuario.borrado_Logico=? and Rol_Usuario.id_Usuario=Usuario.id_Usuario and id_Rol=3",[solicitud.body.cedula,email,0],function(error,res,filas){
       if(error){
         console.log(error);
       }else{
@@ -292,10 +333,10 @@ router.post('/denunciarU', function(solicitud, respuesta, next) {
 });
 /*****************Cerrar cuenta bloqueada******************/
 router.post('/cuentaBloqueada', function(solicitud, respuesta, next) { 
-  var cuenta=db.query("SELECT borrado_Logico FROM Usuario WHERE id_Usuario=?",[solicitud.body.id_Usuario],function(error,resBD,filas){
+  var cuenta=db.query("SELECT borrado_Logico FROM Rol_Usuario WHERE id_Usuario=? and id_Rol=?",[solicitud.body.id_Usuario,3],function(error,resBD,filas){
     if(error){
       console.log(error);
-    }else{ 
+    }else{       
       respuesta.json(resBD);   //terminar la peticion 
     }  
   })

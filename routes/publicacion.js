@@ -65,7 +65,8 @@ router.post('/crearPublicacionE', function(solicitud, respuesta, next) {
   var year = todayTime.getFullYear();
   var fecha=year + "/" + month + "/" + day; 
   var fechaP = new Date();     
-  var verificarCédula=db.query("SELECT cedula FROM Usuario WHERE cedula!=?",[solicitud.body.numero_Documento],function(error,respuestaBD){
+ // var verificarCédula=db.query("SELECT cedula FROM Usuario WHERE id_Usuario=? and cedula!=?",[solicitud.body.id_Usuario,solicitud.body.numero_Documento],function(error,respuestaBD){
+    var verificarCédula=db.query("SELECT cedula FROM Usuario WHERE cedula!=?",[solicitud.body.numero_Documento],function(error,respuestaBD){
         /*respuestaBD es la respuesta que el servidor obtiene de la base de datos a traves de la sentencia */
       if(error){
         console.log(error);
@@ -139,7 +140,7 @@ router.post('/crearPublicacionP', function(solicitud, respuesta, next) {
               })
             }            
           }; 
-                            var seleccionarToken=db.query('SELECT token from Usuario WHERE cedula=? and id_Usuario!=?', [solicitud.body.numero_Documento,solicitud.body.id_Usuario],function(error,resBD,filas){
+                  var seleccionarToken=db.query('SELECT token from Usuario WHERE cedula=? and id_Usuario!=?', [solicitud.body.numero_Documento,solicitud.body.id_Usuario],function(error,resBD,filas){
                     if(error){
                       console.log(error);
                     }else{
@@ -162,7 +163,6 @@ router.post('/crearPublicacionP', function(solicitud, respuesta, next) {
 //borrado_Logico se verifica si esta en cero para saber si el usuario la dio de baja y asi no presentar dicha publicacion
 //Se envia el resultado de la consulta a la aplicacion los datos id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento para mostrar la lista de publicaciones
 router.post('/listaPublicacion', function(solicitud, respuesta, next) { 
-      
   var mostrarLista=db.query("SELECT Publicacion.id_Publicacion,tipo_Publicacion,fecha_Publicacion,numero_Documento,id_Usuario,revision from Publicacion where Publicacion.id_Usuario=? and Publicacion.borrado_Logico=?",[solicitud.body.idIdentificacion,0],function(error,resBD,filas){
     if(error){
       console.log(error);

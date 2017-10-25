@@ -26,39 +26,6 @@ var request = require('request');
 //var API_KEY = "AAAAMN0SfGs:APA91bFJ25Cq6UNp2xvMlrkJXweaOBDijKS4JLm1KgvV3uOTYVlSIuYYJiTg5IjEzoip_yAl6qAaO9KsiuRoSsr9bI9ZygCUvlIOIidlY5LdQUVbVQjoX0wQVHs3_gImdOQLu15BBO6M"; // Your Firebase Cloud Server API key
 //node_modules contiene todas las librerias que estubieron en el package.json
 var app = express(); //Instancia expres para utilizar sus metodos
-//datos para crear la conecccion entre la base de datos 
-
-
-/*
-function sendNotificationToUser(token, message) {
-  request({
-    url: 'https://fcm.googleapis.com/fcm/send',
-    method: 'POST',
-    headers: {
-      'Content-Type' :' application/json',
-      'Authorization': 'key='+API_KEY
-    },
-    body: JSON.stringify({
-      notification: {
-        title: message
-      },
-      to : token
-    })
-  }, function(error, response, body) {
-    if (error) { console.error(error); }
-    else if (response.statusCode >= 400) { 
-      console.error('HTTP Error: '+response.statusCode+' - '+response.statusMessage); 
-    }
-    else {
-      console.log("se envio");
-    }
-  });
-}
-
-
-sendNotificationToUser("crMS817Mh_U:APA91bFrGCxdvAvPbpaCRp4t9S0a9500CX9XOBNhwdjXiAtRpNBh2Nl0PRjyQJGkG5G5GbNh859dp8idk9t3iizWK5fqRfiqzybtfF2VGbYVWclKMI1xqjADo8KSxhpJ9aLFN5MLQ2GD","hola nueva notificacion");*/
-
-
 var conecccion =mysql.createConnection({
     host:'localhost',
     user:'root',
@@ -85,8 +52,11 @@ app.io= require("socket.io")();
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: "50mb"}));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
@@ -106,29 +76,6 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
 
 
   

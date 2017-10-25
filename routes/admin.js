@@ -4,11 +4,11 @@ var router = express.Router();
 
 router.post('/iniciarSesion', function(solicitud, respuesta, next) {
    //   console.log(solicitud.body);  
-      var iniciarsession=db.query("SELECT *FROM Usuario WHERE cedula=? and contrasena=? and rol='admin'",[solicitud.body.usuario,solicitud.body.contrasena],function(error,usuario){
+      var iniciarsession=db.query("SELECT *FROM Usuario, Rol_Usuario WHERE cedula=? and contrasena=? and (id_Rol=? or id_Rol=?) and Rol_Usuario.id_Usuario=Usuario.id_Usuario",[solicitud.body.usuario,solicitud.body.contrasena,1,2],function(error,usuario){
         if(error){         
+          console.log("ixjzijxizjixj");  
            respuesta.json("1");  
-        }else{
-        //  console.log(usuario);      
+        }else{      
           if(usuario.length>0){              
               solicitud.session.nombre=usuario[0].nombres;
               solicitud.session._id=usuario[0].id_Usuario;                  
@@ -17,14 +17,14 @@ router.post('/iniciarSesion', function(solicitud, respuesta, next) {
               usuario[0].foto=f2;   
               respuesta.json(usuario);
           }else{
-            respuesta.json(usuario);
+            respuesta.json("-1");
+          }
         }
-      }
-    });      
+      });      
 });
 
 router.get('/listaUsuarios', function(solicitud, respuesta, next) {  
-      var consulta=db.query("SELECT *FROM Usuario WHERE rol!='admin'",function(error,usuarios){
+      var consulta=db.query("SELECT *FROM Usuario,Rol,Rol_Usuario WHERE Rol_Usuario.id_Rol!=? and Usuario.id_Usuario=Rol_Usuario.id_Usuario and Rol_Usuario.id_Rol=Rol.id_Rol",[1],function(error,usuarios){
                   if(error){
                     console.log(error);                  
                     respuesta.json(1);  
@@ -99,7 +99,7 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
   //var id=parseInt(solicitud.body.id.toString());  
  // console.log(solicitud.body);
  var razon="";
-   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
+   var consulta=db.query("SELECT *FROM Usuario,Rol_Usuario WHERE Usuario.id_Usuario=? and id_Rol!=? and Usuario.id_Usuario=Rol_Usuario.id_Usuario",[solicitud.body.id,1],function(error,usuario){
      if(error){
        console.log(error);                  
      }else{
@@ -113,7 +113,7 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
             estado=0;
             r=0;
           }
-          var consulta1=db.query('UPDATE Usuario SET borrado_Logico=? WHERE id_Usuario=?',[estado,solicitud.body.id],function(error,res){
+          var consulta1=db.query('UPDATE Rol_Usuario SET borrado_Logico=? WHERE id_Usuario=?',[estado,solicitud.body.id],function(error,res){
             if(error){
                 console.log(error); 
             }else{   
@@ -147,12 +147,12 @@ router.put('/estado_usuario', function(solicitud, respuesta, next) {
 });
 router.put('/inactivarDenuncia', function(solicitud, respuesta, next) {  
   var razon="";
-   var consulta=db.query("SELECT *FROM Usuario WHERE id_Usuario=? and rol!='admin'",[solicitud.body.id],function(error,usuario){
+   var consulta=db.query("SELECT *FROM Usuario,Rol_Usuario WHERE id_Usuario=? and id_Rol=? Usuario.id_Usuario=Rol_Usuario.id_Usuario",[solicitud.body.id,3],function(error,usuario){
      if(error){
        console.log(error);                  
      }else{
         if(usuario.length>0){          
-          var consulta1=db.query('UPDATE Usuario SET borrado_Logico=? WHERE id_Usuario=?',[1,solicitud.body.id],function(error,res){
+          var consulta1=db.query('UPDATE Rol_Usuario SET borrado_Logico=? WHERE id_Usuario=?',[1,solicitud.body.id],function(error,res){
             if(error){
                 console.log(error); 
             }else{   
@@ -237,22 +237,28 @@ router.put('/inactivarPublicacion', function(solicitud, respuesta, next) {
 });
 router.post('/cerrar_session', function(req, res, next) {
   //console.log("cerrar_session");
- // console.log(req.body.datos.nombres);
+  //console.log(req.body.datos.nombres);
   delete  req.session.nombre;
   delete  req.session.id;
   //res.redirect(200,'../');
-  res.json("isajiasj");
+  res.json("1");
 });
+
 router.get('/verificarSesion', function(solicitud, respuesta, next) {
   //console.log("cerrar_session");
  // console.log(req.body.datos.nombres);
- console.log(solicitud.session.nombre);
   if (solicitud.session.nombre&&solicitud.session.id) {
     respuesta.json("0");
   }else{
     respuesta.json("1");
   }
 });
+router.post('/crearUsuario', function(solicitud, respuesta, next) {
+  console.log("********CREAR USUARIO**********");
+  console.log(solicitud.body);
+  respuesta.json("1");
+});
+
 
 return router;
 }
