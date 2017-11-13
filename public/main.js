@@ -135,7 +135,15 @@ app.controller( 'loginController', function($scope, $http,$state,datosUser) {
                 }               
             })
             .catch(function(data) {                
-                console.log('Error:' + data);
+                var mensaje = confirm("Ha ocurrido un error intenta :(");
+                //Detectamos si el usuario acepto el mensaje
+                if (mensaje) {
+                    $scope.iniciarSession();
+                }
+                //Detectamos si el usuario denegó el mensaje
+                else {
+                  $state.go("login");
+                }
             });
     };
 });
@@ -361,7 +369,7 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                 var filePreview = document.getElementById('file-preview');
                 filePreview.src = e.target.result;
                 var f=e.target.result;
-                alert(f);
+              //  alert(f);
                 res = f.split(",");
                // console.log("  despues de la coma  "+ res[1]);
                //$scope.usuario.foto=res[1];
@@ -379,8 +387,6 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
     }     
     $scope.crearUsuario=function(){
             $scope.usuario.foto=res[1];
-            alert(res[0]);
-            alert($scope.usuario.foto);
              $http.post('/admin/crearUsuario', $scope.usuario)
             .then(function(data) {    
             console.log(data['data']);        
@@ -394,6 +400,7 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                             alert('La cuenta esta bloqueda, comunicarse al correo electronico karyto743@gmail.com');
                         } else {
                              alert('SE CREO CORECTAMENTE LA CUENTA');
+                             $scope.listarUser();
                         }
                     }
                 }

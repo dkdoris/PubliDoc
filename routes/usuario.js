@@ -115,45 +115,44 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
           } 
         })
       }else{
-        var crearUsuario3=db.query('SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol=?', [resBD[0]['id_Usuario'],3],function(error,res1){
-          if(error){
-            console.log(error);
-          }else{  
-            if (res1!="") {
-              var crearUsuario4=db.query('SELECT *FROM Usuario WHERE cedula=? and email=?', [solicitud.body.cedula,solicitud.body.email],function(error,res7){
+        var crearUsuario4=db.query('SELECT *FROM Usuario WHERE cedula=? and email=?', [solicitud.body.cedula,solicitud.body.email],function(error,res7){
                 if(error){
                   console.log(error);
                 }else{ 
                    if (res7!="") {
-                      if (res1[0]['borrado_Logico']==1){
-                        console.log("tengo cuenta de usuario bloqueada");
-                        respuesta.json(-3);  
+                    var crearUsuario3=db.query('SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol=?', [resBD[0]['id_Usuario'],3],function(error,res1){
+                        if(error){
+                          console.log(error);
+                        }else{  
+                          if (res1!="") {
+                            if (res1[0]['borrado_Logico']==1){
+                              console.log("tengo cuenta de usuario bloqueada");
+                              respuesta.json(-3);  
 
-                      }else{
-                        console.log("tengo cuenta de usuario no bloqueada");
-                        respuesta.json(-2);
-                      }
-                   }else{
+                            }else{
+                              console.log("tengo cuenta de usuario no bloqueada");
+                              respuesta.json(-2);
+                            }
+                          }else{
+                            var crearUsuario5=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,resBD[0]['id_Usuario'],0],function(error,res2){
+                              if(error){
+                                console.log(error);
+                              }else{           
+                                datos=resBD[0]['id_Usuario'];
+                                console.log("tengo cuenta de mediador o administrador");
+                                //devuelve la respuesta json el servidor
+                                respuesta.json(datos);
+                              } 
+                            })
+                          }        
+                        } 
+                      })
+                   }else{                      
                       console.log("Los datos se encuentran en una cuenta");
                       //Cuando ya existe una cuenta creada
                       respuesta.json(datos);
                    }
                 } 
-              })
-
-            }else{
-                  var crearUsuario5=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,resBD[0]['id_Usuario'],0],function(error,res2){
-                    if(error){
-                      console.log(error);
-                    }else{           
-                      datos=resBD[0]['id_Usuario'];
-                      console.log("tengo cuenta de administrador o mediador pero no tengo cuenta de Usuario");
-                      //devuelve la respuesta json el servidor
-                      respuesta.json(datos);
-                    } 
-                  })
-            }        
-          } 
         })        
       }   
     };
@@ -368,6 +367,3 @@ router.post('/cuentaBloqueada', function(solicitud, respuesta, next) {
 });
 return router;
 }
-
-
-

@@ -259,9 +259,7 @@ router.get('/verificarSesion', function(solicitud, respuesta, next) {
   }
 });
 router.post('/crearUsuario', function(solicitud, respuesta, next) {
-  console.log("fecha_Nacimiento "+solicitud.body.fecha_Nacimiento);
   var ms = Date.parse(solicitud.body.fecha_Nacimiento);
-  console.log("ms "+ms);
   var todayTime  = new Date(solicitud.body.fecha_Nacimiento);
   var month = todayTime.getMonth() + 1;
   var day = todayTime.getDate();
@@ -275,7 +273,6 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
       console.log(error);
     }else{
       if (resBD=="") {
-          console.log("===================00 "+solicitud.body.fecha_Nacimiento);
   //      datos=-1;
         var crearUsuario=db.query('INSERT INTO Usuario(cedula,nombres,contrasena,fecha_Nacimiento,email,celular,link_Facebook,calificacion_Total,foto,token) VALUES(?,?,?,?,?,?,?,?,?,?)', [solicitud.body.cedula,solicitud.body.nombres,solicitud.body.contrasena,fecha,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook,0,solicitud.body.foto,solicitud.body.token],function(error,res){
           if(error){
@@ -295,46 +292,45 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
           } 
         })
       }else{
-        var crearUsuario2=db.query('SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol=?', [resBD[0]['id_Usuario'],solicitud.body.tipo],function(error,res1){
-          if(error){
-            console.log(error);
-          }else{  
-            if (res1!="") {
-              var crearUsuario3=db.query('SELECT *FROM Usuario WHERE cedula=? and email=?', [solicitud.body.cedula,solicitud.body.email],function(error,res7){
+                var crearUsuario4=db.query('SELECT *FROM Usuario WHERE cedula=? and email=?', [solicitud.body.cedula,solicitud.body.email],function(error,res7){
                 if(error){
                   console.log(error);
                 }else{ 
                    if (res7!="") {
-                      if (res1[0]['borrado_Logico']==1){
-                        console.log("tengo cuenta de usuario bloqueada");
-                        respuesta.json(-3);  
+                    var crearUsuario3=db.query('SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol=?', [resBD[0]['id_Usuario'],solicitud.body.tipo],function(error,res1){
+                        if(error){
+                          console.log(error);
+                        }else{  
+                          if (res1!="") {
+                            if (res1[0]['borrado_Logico']==1){
+                              console.log("tengo cuenta de usuario bloqueada");
+                              respuesta.json(-3);  
 
-                      }else{
-                        console.log("tengo cuenta de usuario no bloqueada");
-                        respuesta.json(-2);
-                      }
-                   }else{
+                            }else{
+                              console.log("tengo cuenta de usuario no bloqueada");
+                              respuesta.json(-2);
+                            }
+                          }else{
+                            var crearUsuario5=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [solicitud.body.tipo,resBD[0]['id_Usuario'],0],function(error,res2){
+                              if(error){
+                                console.log(error);
+                              }else{           
+                                datos=resBD[0]['id_Usuario'];
+                                console.log("tengo cuenta de mediador o usuario");
+                                //devuelve la respuesta json el servidor
+                                respuesta.json(datos);
+                              } 
+                            })
+                          }        
+                        } 
+                      })
+                   }else{                      
                       console.log("Los datos se encuentran en una cuenta");
                       //Cuando ya existe una cuenta creada
                       respuesta.json(datos);
                    }
                 } 
-              })
-
-            }else{
-                  var crearUsuario4=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [solicitud.body.tipo,resBD[0]['id_Usuario'],0],function(error,res2){
-                    if(error){
-                      console.log(error);
-                    }else{           
-                      datos=resBD[0]['id_Usuario'];
-                      console.log("tengo cuenta de administrador o mediador pero no tengo cuenta de Usuario");
-                      //devuelve la respuesta json el servidor
-                      respuesta.json(datos);
-                    } 
-                  })
-            }        
-          } 
-        })        
+        })      
       }   
     };
   })

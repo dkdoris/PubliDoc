@@ -75,7 +75,7 @@
             </div>
             <div style="width:50%; float:left;">
                 <h5>Nombres y apellidos</h5>             
-                <input placeholder="Ingrese número de cédula" required>
+                <input placeholder="Ingrese número de cédula" ng-model="usuario.nombres" required>
                 <h5>Fecha de nacimiento</h5>             
                 <input placeholder="Ingresar fecha de nacimiento" type="date" ng-model="usuario.fecha_Nacimiento" min="{{fechaPasada |date:'yyyy-MM-dd'}}" max="{{fechaActual |date:'yyyy-MM-dd'}}" required>
                             <h5>Email</h5>
