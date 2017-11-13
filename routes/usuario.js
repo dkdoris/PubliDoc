@@ -1,4 +1,3 @@
-
 module.exports=function(db){//Importar y exportar módulos a node
 //Framewor que utiliza node
 var express = require('express'),
@@ -35,7 +34,7 @@ router.post('/iniciarsession', function(solicitud, respuesta, next) {
        
         })
       }else{*/
-        if (columnas!="") {
+        if (columnas!="") {          
           respuesta.json(columnas);
         }else{
           respuesta.json("-1");
@@ -47,7 +46,7 @@ router.post('/iniciarsession', function(solicitud, respuesta, next) {
   })
 });
 router.post('/guardarToken', function(solicitud, respuesta, next) {  
-//console.log(solicitud.body);    
+console.log(solicitud.body);    
   var modificarToken=db.query("UPDATE Usuario SET token=? WHERE id_Usuario=?", [solicitud.body.tK,solicitud.body.idUs],function(error,resBD2,filas){
     if(error){
       console.log(error);
@@ -91,17 +90,19 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
   var year = todayTime.getFullYear();
   var fecha=year + "/" + month + "/" + day; 
   var datos=0;
+  var nombre=solicitud.body.nombres+" "+solicitud.body.apellidos;
+  console.log(nombre);
   var buscarUsuario=db.query('SELECT *FROM Usuario WHERE cedula=? or email=?', [solicitud.body.cedula,solicitud.body.email],function(error,resBD){    
     if(error){
       console.log(error);
     }else{
       if (resBD=="") {
   //      datos=-1;
-        var crearUsuario=db.query('INSERT INTO Usuario(cedula,nombres,contrasena,fecha_Nacimiento,email,celular,link_Facebook,calificacion_Total,foto,token) VALUES(?,?,?,?,?,?,?,?,?,?)', [solicitud.body.cedula,solicitud.body.nombres,solicitud.body.contrasena,fecha,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook,0,solicitud.body.foto,solicitud.body.token],function(error,res){
+        var crearUsuario=db.query('INSERT INTO Usuario(cedula,nombres,contrasena,fecha_Nacimiento,email,celular,link_Facebook,calificacion_Total,foto,token) VALUES(?,?,?,?,?,?,?,?,?,?)', [solicitud.body.cedula,nombre,solicitud.body.contrasena,fecha,solicitud.body.email,solicitud.body.celular,solicitud.body.link_Facebook,0,solicitud.body.foto,solicitud.body.token],function(error,res){
           if(error){
             console.log(error);
           }else{  
-            var crearUsuario=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,res.insertId,0],function(error,res2){
+            var crearUsuario2=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,res.insertId,0],function(error,res2){
                 if(error){
                   console.log(error);
                 }else{           
@@ -114,25 +115,43 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
           } 
         })
       }else{
-        var crearUsuario=db.query('SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol!=?', [resBD[0]['id_Usuario'],3],function(error,res1){
+        var crearUsuario3=db.query('SELECT *FROM Rol_Usuario WHERE id_Usuario=? and id_Rol=?', [resBD[0]['id_Usuario'],3],function(error,res1){
           if(error){
             console.log(error);
           }else{  
             if (res1!="") {
-//              datos=-2;
-              var crearUsuario=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,resBD[0]['id_Usuario'],0],function(error,res2){
+              var crearUsuario4=db.query('SELECT *FROM Usuario WHERE cedula=? and email=?', [solicitud.body.cedula,solicitud.body.email],function(error,res7){
                 if(error){
                   console.log(error);
-                }else{           
-                  datos=resBD[0]['id_Usuario'];
-                  console.log("tengo cuenta de administrador o mediador");
-                  //devuelve la respuesta json el servidor
-                  respuesta.json(datos);
+                }else{ 
+                   if (res7!="") {
+                      if (res1[0]['borrado_Logico']==1){
+                        console.log("tengo cuenta de usuario bloqueada");
+                        respuesta.json(-3);  
+
+                      }else{
+                        console.log("tengo cuenta de usuario no bloqueada");
+                        respuesta.json(-2);
+                      }
+                   }else{
+                      console.log("Los datos se encuentran en una cuenta");
+                      //Cuando ya existe una cuenta creada
+                      respuesta.json(datos);
+                   }
                 } 
               })
+
             }else{
-              console.log("tengo cuenta de usuario");
-              respuesta.json(datos);
+                  var crearUsuario5=db.query('INSERT INTO Rol_Usuario(id_Rol,id_Usuario,borrado_Logico) VALUES(?,?,?)', [3,resBD[0]['id_Usuario'],0],function(error,res2){
+                    if(error){
+                      console.log(error);
+                    }else{           
+                      datos=resBD[0]['id_Usuario'];
+                      console.log("tengo cuenta de administrador o mediador pero no tengo cuenta de Usuario");
+                      //devuelve la respuesta json el servidor
+                      respuesta.json(datos);
+                    } 
+                  })
             }        
           } 
         })        
@@ -271,35 +290,41 @@ var generarContrasena=function(){
 router.post('/enviarInfoUsuario',function(solicitud,respuesta){
 
     var email=solicitud.body.email;
-    var validarEmail=db.query("SELECT *FROM Usuario,Rol_Usuario WHERE cedula=? and email=? and Rol_Usuario.borrado_Logico=? and Rol_Usuario.id_Usuario=Usuario.id_Usuario and id_Rol=3",[solicitud.body.cedula,email,0],function(error,res,filas){
+    var validarEmail=db.query("SELECT Rol_Usuario.borrado_Logico,Usuario.id_Usuario FROM Usuario,Rol_Usuario WHERE cedula=? and email=? and Rol_Usuario.id_Usuario=Usuario.id_Usuario and Rol_Usuario.id_Rol=3",[solicitud.body.cedula,email],function(error,res,filas){
       if(error){
         console.log(error);
       }else{
         if(res!=""){
-          var contrasena=generarContrasena();
-          var cadenaContrasena='<strong>Contraseña: </strong>';
-          cadenaContrasena=cadenaContrasena+contrasena;
-          var nodeM=nodemailer.createTransport("smtps://karyto743@gmail.com:743rya347@smtp.gmail.com");
-          var mailOpciones={
-            from:"karyto743@gmail.com",
-            to:email, 
-            subject:"Documentos Extravidos",
-            html:cadenaContrasena      
-          }
-          nodeM.sendMail(mailOpciones,function(error,respuesta){
-            if(error){
-              console.log(error+"asdasd");
-            }else{
-              console.log("Email enviado con exito");
+          if(res[0]['borrado_Logico']==0){
+              var contrasena=generarContrasena();
+              var cadenaContrasena='<strong>Contraseña: </strong>';
+              cadenaContrasena=cadenaContrasena+contrasena;
+              var nodeM=nodemailer.createTransport("smtps://karyto743@gmail.com:743rya347@smtp.gmail.com");
+              var mailOpciones={
+                from:"karyto743@gmail.com",
+                to:email, 
+                subject:"Documentos Extravidos",
+                html:cadenaContrasena      
+              }
+              nodeM.sendMail(mailOpciones,function(error,respuesta){
+                if(error){
+                  console.log(error+"asdasd");
+                }else{
+                  console.log("Email enviado con exito");
+                }
+              });
+              var modificarUsuario=db.query('UPDATE Usuario SET contrasena=? WHERE id_Usuario=?', [contrasena,res[0]['id_Usuario']],function(error,columnas,filas){
+                if(error){
+                    console.log(error);
+                }else{         
+                } 
+              })
+              respuesta.json(res);
+          }else{
+            if(res[0]['borrado_Logico']==1){
+              respuesta.json(res);
             }
-          });
-          var modificarUsuario=db.query('UPDATE Usuario SET contrasena=? WHERE id_Usuario=?', [contrasena,res[0]['id_Usuario']],function(error,columnas,filas){
-            if(error){
-                console.log(error);
-            }else{            
-            } 
-          })
-          respuesta.json(res);
+          }
         }else{
           respuesta.json("");
         }

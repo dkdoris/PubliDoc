@@ -112,21 +112,23 @@ app.controller( 'loginController', function($scope, $http,$state,datosUser) {
         //Se presente todo el menu
         $http.post('/admin/iniciarSesion', $scope.varIniciarSession)
             .then(function(data) {
-                alert(data['data']);
-                if(data!=1){   
+                if(data['data']!=1){   
                     if(data['data']==-1){
                         alert("Los datos estan mal ingresados o la cuenta no existe");
 
                     }else{
                          datosUser.user=data['data'][0];
-                        if(data['data'][0]['id_Rol']==1){
-                            $state.go("principal.gestion_usuarios");   
-                        }else{
-                            if(data['data'][0]['id_Rol']==2){
-                                $state.go("principal.gestion_publicacion"); 
+                         if (data['data'][0]['borrado_Logico']==1) {
+                            alert("La cuenta esta bloqueada");
+                         }else{
+                            if(data['data'][0]['id_Rol']==1){
+                                $state.go("principal.gestion_usuarios");   
+                            }else{
+                                if(data['data'][0]['id_Rol']==2){
+                                    $state.go("principal.gestion_publicacion"); 
+                                }
                             }
-                        }
-                         
+                         }                         
                     }
  
 
@@ -249,15 +251,24 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
     };
 })
 .controller('gestion_usuariosController',function($scope, $http,$state,validarCed){  
+    $scope.logContrasena = true;
+    $scope.emailValido = true;
+        //Crea una fecha actual
+    $scope.fechaActual = new Date();
+    //Calcula la fecha limite a ser presentada
+    $scope.fechaPasada = new Date();
+    $scope.fechaPasada.setDate($scope.fechaPasada.getDate() - 36500);   
     $scope.usuario={        
-        cedula: '1105679664',
-        nombres: 'doris guaman',
-        fecha_Nacimiento: '12-10-19912',
-        email: '23233',
-        celular: '0991661884',
+        cedula: '',
+        nombres: '',
+        fecha_Nacimiento: '',
+        email: '',
+        celular: '',
         link_Facebook: '',
-        contrasena: '111',
-        foto: ''
+        contrasena: '',
+        foto: '',
+        tipo:'',
+        token:''
     }
     var res;
     $scope.mensaje="";
@@ -274,9 +285,10 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
     }
     $scope.listarUser();
 
-    $scope.desactivar=function(id){        
-        $http.put('/admin/estado_usuario',{id})
+    $scope.desactivar=function(id,tipo){        
+        $http.put('/admin/estado_usuario',{id,tipo})
             .then(function(data) {  
+                console.log(data['data']);
                 if(data['data']==0){
                     $scope.mensaje="Usuario activo";
                 }else{
@@ -301,7 +313,36 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                 console.log('Error:' + data);
             });                
     } 
+    $scope.tamanoContrasena = function () {
+        if (($scope.usuario.contrasena.length > 4) && ($scope.usuario.contrasena.length < 21)) {
+            $scope.logContrasena = true;
+        } else {
+            $scope.logContrasena = false;
+        }
 
+    };
+        //Verifica el formato ingresado en el campo del email para ver si esta correcto de lo contrario muestra un mensaje de error
+    $scope.validarEmail = function () {
+        if ((/(.+)@(.+){2,}\.(.+){2,}/.test($scope.usuario.email)) && ($scope.usuario.email != "")) {
+            $scope.emailValido = true;
+        } else {
+            if ($scope.usuario.email != "") {
+                $scope.emailValido = false;
+            }
+        }
+    };
+    $scope.obtenerTipoUser=function(){
+        $http.get('/admin/obtener_TipoUsuario')
+        .then(function(data) {            
+            $scope.tipoUser=data['data'];
+                
+        })
+        .catch(function(data) {  
+
+            console.log('Error:' + data['data']);
+        });
+
+    }
     $scope.tipoInput = 'password';
     $scope.mostrarEsconderContrasena = function () {
         if ($scope.tipoInput == 'password')
@@ -309,21 +350,23 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
         else
             $scope.tipoInput = 'password';
     }
-        function readFile(input) {
+    function readFile(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
  
             reader.onload = function (e) {
-                var filePreview = document.createElement('img');
-                filePreview.id = 'file-preview';
+                /*var filePreview = document.createElement('img');
+                filePreview.id = 'file-preview';*/
                 //e.target.result contents the base64 data from the image uploaded
+                var filePreview = document.getElementById('file-preview');
                 filePreview.src = e.target.result;
                 var f=e.target.result;
+                alert(f);
                 res = f.split(",");
-                console.log("  despues de la coma  "+ res[0]);
+               // console.log("  despues de la coma  "+ res[1]);
                //$scope.usuario.foto=res[1];
-                var previewZone = document.getElementById('file-preview-zone');
-                previewZone.appendChild(filePreview);
+               // var previewZone = document.getElementById('file-preview-zone');
+                //previewZone.appendChild(filePreview);
             }
  
             reader.readAsDataURL(input.files[0]);
@@ -335,13 +378,25 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
         readFile(e.srcElement);
     }     
     $scope.crearUsuario=function(){
-           //var datos=datosUser.user;
-               $scope.usuario.foto=res[1];
-               //alert($scope.usuario.foto);
-               console.log($scope.usuario);
+            $scope.usuario.foto=res[1];
+            alert(res[0]);
+            alert($scope.usuario.foto);
              $http.post('/admin/crearUsuario', $scope.usuario)
-            .then(function(data) {            
-                alert("Se creo");
+            .then(function(data) {    
+            console.log(data['data']);        
+                if (data['data']== 0) {
+                    alert('Algunos datos ingresados pertenecen a una cuenta, comunicarse al correo electronico karyto743@gmail.com');
+                } else {
+                    if (data['data'] == -2) {                    
+                        alert('La cuenta ya existe, comunicarse al correo electronico karyto743@gmail.com');
+                    } else {   
+                        if (data['data'] == -3) {                                  
+                            alert('La cuenta esta bloqueda, comunicarse al correo electronico karyto743@gmail.com');
+                        } else {
+                             alert('SE CREO CORECTAMENTE LA CUENTA');
+                        }
+                    }
+                }
                 
             })
             .catch(function(data) {  
@@ -349,28 +404,17 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                 console.log('Error:' + data['data']);
             });
     };
-    /*cope.validarCedula = function () {   
+    $scope.validarCedula = function () {   
         if($scope.usuario.cedula.length==10){
-            $http.get('http://siaaf.unl.edu.ec:8091/api/v1/servicios_web/buscar-por-cedula-reg-civil/' + $scope.usuario.cedula)
-            .then(function(data) {  
-            console.log(data);        
-                    if ((data["data"]["Error"] == "CEDULA NO ENCONTRADA") || (data["data"]["CodigoError"] == "001")) {
-                        
-                    } else {
-                        $scope.cedulaValida=true;
-                        $scope.nombres = data["data"]["Nombre"];
-                        $scope.edad = data["data"]["FechaNacimiento"];
-                        $scope.usuario.nombres = $scope.nombres;
-                        $scope.usuario.fecha_Nacimiento = $scope.edad;
-                    }
-            })
-            .catch(function(data) {                
-                console.log('Error:' + data);
-            });                
+            if (validarCed.validarCedul($scope.usuario.cedula) == true) {
+                $scope.cedulaValida = true;
+            } else {
+                $scope.cedulaValida = false;
+            }                   
         }else{
             $scope.cedulaValida=false;
         } 
-    }*/
+    }
 })
 .controller('denuncias_usuariosController',function($scope, $http,$state){
     $scope.mensajeDU="";
@@ -420,3 +464,74 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                 });
     };                                              
 })
+.controller('denuncias_publicacionesController',function($scope, $http,$state){
+    $scope.mensajeDP="";
+    var id_D;
+    $scope.cargarDenunciasPublicaciones=function(){
+        $http.get('/admin/listaPublicacionesDenunciadas')
+                .then(function(data) {                
+                $scope.listaPublicacionesDenunciadas=data['data'];
+                $scope.mensajeDP="";
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+                });
+    }
+    $scope.cargarDenunciasPublicaciones();
+    $scope.omitirDenucia=function(id_Denuncia){
+        $http.put('/admin/omitirDenunciaUsuario',{id_Denuncia})
+            .then(function(data) {                
+                $scope.mensajeDP="La denuncia ha sido omitida";
+                //$state.go("principal.denuncias_usuarios");  
+                $scope.cargarDenunciasPublicaciones();
+            })
+            .catch(function(data) {                
+                    console.log('Error:' + data);
+                });
+    }; 
+    $scope.verPublicacion=function(descripcionDenuncia,id_PublicacionD,id_Denuncia){
+        $scope.denuncia=descripcionDenuncia;
+        id_D=id_Denuncia;
+        $http.post('/admin/mostrarPublicacion',{id_PublicacionD})
+                .then(function(data) {              
+                    $scope.datosPublicacion=data['data'][0];
+                    if(data['data'][0]['fecha_Encuentro']!=null){
+                        var todayTime  = new Date(data['data'][0]['fecha_Encuentro']);
+                        var month = todayTime.getMonth() + 1;
+                        var day = todayTime.getDate();
+                        var year = todayTime.getFullYear();
+                        var fecha=year + "/" + month + "/" + day;   
+                        $scope.datosPublicacion.fecha_Encuentro=fecha;
+                    } 
+                    if(data['data'][0]['fecha_Perdida']!=null){
+                        var todayTime  = new Date(data['data'][0]['fecha_Perdida']);
+                        var month = todayTime.getMonth() + 1;
+                        var day = todayTime.getDate();
+                        var year = todayTime.getFullYear();
+                        var fecha=year + "/" + month + "/" + day;   
+                        $scope.datosPublicacion.fecha_Perdida=fecha;
+                    }                    
+                    //$scope.mensajeDP="La publicación se dio de baja ";
+                })
+                .catch(function(data) {                
+                    console.log('Error:' + data);
+                });
+    }
+    $scope.desactivarPublicacion=function(id_Publicacion){
+        var razon = prompt("¿Escriba la razon de porque esta publicación va a ser negada?", "");
+            if (razon != null){
+                $http.put('/admin/inactivarPublicacion',{id_Publicacion,id_D,razon})
+                    .then(function(data) {  
+                        $scope.mensajeDP="La publicación se dio de baja ";            
+                        $scope.cargarDenunciasPublicaciones();                    
+                    })
+                    .catch(function(data) {                
+                        console.log('Error:' + data);
+                    });            
+            }else {
+                alert("Para realizar esta operación se debe ingresar la razón");
+            }
+
+    }    
+    
+});

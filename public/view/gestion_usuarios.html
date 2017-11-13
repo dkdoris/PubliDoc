@@ -13,7 +13,7 @@
 </div>
 
 <div>  
-    <button class="btn btn-success" style="float:right; padding-right:13px; margin-bottom:13px;" data-toggle="modal" data-target="#crearU">Crear Usuario</button>
+    <button class="btn btn-success" style="float:right; padding-right:13px; margin-bottom:13px;" data-toggle="modal" data-target="#crearU" ng-click="obtenerTipoUser()">Crear Usuario</button>
     <table  datatable="ng" class="table" width="100%"  id="dataTables-example">
                                 <thead>
                                     <tr>
@@ -31,7 +31,7 @@
                                         <td ng-if="usuario.borrado_Logico===0">Activo</td>
                                         <td ng-if="usuario.borrado_Logico===1">Inactivo</td>
                                         <td>{{usuario.tipo}}</td>
-                                        <td><a ng-click="desactivar(usuario.id_Usuario)">Act/Desc</a>                                    
+                                        <td><a ng-click="desactivar(usuario.id_Usuario,usuario.tipo)">Act/Desc</a>                                
                                         <a ng-click="restaurarContrasena(usuario.id_Usuario,usuario.cedula)">Restaurar Contraseña</a>                                        
                                         </td>                                        
                                     </tr>                                    
@@ -51,38 +51,56 @@
       </div>
       <div class="modal-body">
         <form class="list ">
-            Cédula
-            <input placeholder="Ingrese número de cédula" ng-model="usuario.cedula" ng-keyup="">
-            <label ng-hide="cedulaValida">Cédula incorrecta</label>
-            <br>
-            Nombres y apellidos
-            <input placeholder="Ingrese número de cédula">
-            <br>
-            Fecha de nacimiento
-            <input placeholder="Ingresar fecha de nacimiento">
-            <br>
-            Contraseña
-            <input placeholder="Ingrese la contraseña" ng-model="usuario.contrasena">
-            <br>
-            Email
-            <input placeholder="Ingrese email" ng-model="usuario.email">   
-            <br>         
-            Celular
-            <input placeholder="Ingrese el número de celular" ng-model="usuario.celular">
-            <br>
-            Link facebook
-            <input placeholder="Ingrese el lin de facebook" ng-model="usuario.link_Facebook">
-            <br>
-            Foto
-            <!--<input type="file" name="img" accept=".jpg, .jpeg, .png">-->
-            <div id="divInputLoad">
-                <div id="divFileUpload" style="with:20%">
-                    <input id="file-upload" type="file" accept="image/*" />
-                </div>
-                <div id="file-preview-zone">
-                </div>
+            <div style="width:50%; float:left;">
+                <h5>Cédula</h5>             
+                <input placeholder="Ingrese número de cédula" ng-model="usuario.cedula" ng-keyup="validarCedula()" required>
+                <label ng-hide="cedulaValida" style="color:red;">Cédula incorrecta</label>
+                <h5>Contraseña</h5>             
+                    <div>
+                        <div style="width:35%; float:left;">
+                            <input placeholder="Ingrese la contraseña" ng-model="usuario.contrasena" type="{{tipoInput}}" ng-keyup="tamanoContrasena()" required>
+                        </div>
+                        <div style="float:left;">                    
+                            <INPUT type="checkbox" name="sistoper" value="" ng-click="mostrarEsconderContrasena()">
+                        </div>
+                        <br>
+                        <div ng-hide="logContrasena" style="color:red;"><h5>La contraseña tiene que ser minimo 5 caracteres y maximo 20 caracteres</h5></div>
+                    </div>   
+                                <h5>Celular</h5>                   
+                <input placeholder="Ingrese el número de celular" ng-model="usuario.celular" required>
+                            <h5>Tipo de Usuario</h5>             
+            <select name="repeatSelect" id="repeatSelect" ng-model="usuario.tipo">
+                <option ng-repeat="option in tipoUser" value="{{option.id_Rol}}">{{option.tipo}} </option>
+            </select>
+            </div>
+            <div style="width:50%; float:left;">
+                <h5>Nombres y apellidos</h5>             
+                <input placeholder="Ingrese número de cédula" required>
+                <h5>Fecha de nacimiento</h5>             
+                <input placeholder="Ingresar fecha de nacimiento" type="date" ng-model="usuario.fecha_Nacimiento" min="{{fechaPasada |date:'yyyy-MM-dd'}}" max="{{fechaActual |date:'yyyy-MM-dd'}}" required>
+                            <h5>Email</h5>
+            <input placeholder="Ingrese email" ng-model="usuario.email" type="email" ng-keyup="validarEmail()" required>   
+            <div ng-hide="emailValido" style="color:red;"><h5>Email invalido</h5></div>
+                        <h5>Link facebook</h5>             
+            <input placeholder="Ingrese el lin de facebook" ng-model="usuario.link_Facebook" type="url">
             </div>
 
+            <h5>Foto</h5>             
+            <!--<input type="file" name="img" accept=".jpg, .jpeg, .png">-->
+           <!-- <div id="divInputLoad">
+                <div id="divFileUpload">
+                    <input id="file-upload" type="file" accept="image/*"/>
+                </div>
+
+                <div id="file-preview-zone">
+                </div>
+
+            </div>
+            <!--<img ng-show="usuario.foto !== undefined" ng-src="{{usuario.foto}}" style="text-align: center">
+            <input type="file" ng-click="previewFile()"><br>
+<img src="" height="200" alt="Image preview...">-->
+            <input id="file-upload" type="file" accept="image/*"/>
+            <img id="file-preview" height="200">
         </form>
 
       </div>

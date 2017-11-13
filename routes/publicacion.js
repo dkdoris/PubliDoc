@@ -1,4 +1,3 @@
-
 module.exports=function(db,request){
 var express = require('express'),
 path=require("path");
@@ -23,7 +22,7 @@ router.get('/mostrarDocumento', function(solicitud, respuesta, next) {
   })
 });
 var sendNotificationToUser=function(token,message) {
-  var API_KEY = "AAAAMN0SfGs:APA91bFJ25Cq6UNp2xvMlrkJXweaOBDijKS4JLm1KgvV3uOTYVlSIuYYJiTg5IjEzoip_yAl6qAaO9KsiuRoSsr9bI9ZygCUvlIOIidlY5LdQUVbVQjoX0wQVHs3_gImdOQLu15BBO6M"; // Your Firebase Cloud Server API key
+  var API_KEY = "AAAAOeSNvEc:APA91bGxlzowRwF_NFbDg7vmQGfltqC24VcRF1gcunfx0YOjx0tZdcRzTXNM_67Z3PKM6UDcV8D059j25COi1VFLoYe-zIRUhhlQ7kkwrmgwZWJReDWzr6AhEJSUu6lcyZlqQ861Rc82"; // Your Firebase Cloud Server API key
   request({
     url: 'https://fcm.googleapis.com/fcm/send',
     method: 'POST',
@@ -37,7 +36,12 @@ var sendNotificationToUser=function(token,message) {
         icon:"p.png",
         body:message
       },
-      to : token
+      data:{
+        titulo: "Documentos Extraviados",
+        icono:"p.png",
+        cuerpo:message
+      },
+      "to" : token
     })
   }, function(error, response, body) {
     if (error) { console.error(error); }
@@ -203,7 +207,9 @@ router.put('/modificarPublicacionE', function(solicitud, respuesta, next) {
                     }else{                      
                     } 
                   })
-                }            
+
+                } 
+                           
               };
             } 
           })
