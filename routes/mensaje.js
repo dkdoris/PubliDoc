@@ -162,7 +162,7 @@ var message=solicitud.body.message;
                               console.log(error);
                             }else{
                               if(res!=""){
-                                var mensaje="Nuevo mensaje";
+                                var mensaje="Nuevo mensaje 2";
                                 var t=res[0]['token']+"";
                                 sendNotificationToUser(t,mensaje);
                               }
@@ -199,7 +199,7 @@ var message=solicitud.body.message;
                               console.log(error);
                             }else{
                               if(res2!=""){
-                                var mensaje="Nuevo mensaje";
+                                var mensaje="Nuevo mensaje 2";
                                 var t=res[0]['token']+"";
                                 sendNotificationToUser(t,mensaje);
                               }
@@ -243,7 +243,7 @@ var message=solicitud.body.message;
                               console.log(error);
                             }else{
                               if(res2!=""){
-                                var mensaje="Nuevo mensaje";
+                                var mensaje="Nuevo mensaje 2";
                                 var t=res[0]['token']+"";
                                 sendNotificationToUser(t,mensaje);
                               }

@@ -150,6 +150,7 @@ app.controller( 'loginController', function($scope, $http,$state,datosUser) {
 app.controller( 'gestion_publicaionController', function($scope, $http,$state) {      
     $scope.mensajeP="";
     $scope.listarPublicaciones=function(){
+        $scope.mensajeP="";
      $http.get('/admin/listarPublicaciones')
             .then(function(data) {            
                 $scope.listaPublicaciones=data['data'];                

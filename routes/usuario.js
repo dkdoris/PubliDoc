@@ -245,7 +245,7 @@ router.post('/verUsuario', function(solicitud, respuesta, next) {
             cadenaEmail=cadenaEmail+cadenaCelular+resBD[0]['celular'];
             var cadenaLinkFace='<strong><br/>Link de Facebook: <br/></strong>';
             cadenaEmail=cadenaEmail+cadenaLinkFace+resBD[0]['link_Facebook'];
-            var nodeM=nodemailer.createTransport("smtps://karyto743@gmail.com:743rya347@smtp.gmail.com");
+            var nodeM=nodemailer.createTransport("smtps://karyto743@gmail.com:743ryj347@smtp.gmail.com");
 
             var mailOpciones={
               //Envia desde el la cuenta
@@ -298,7 +298,7 @@ router.post('/enviarInfoUsuario',function(solicitud,respuesta){
               var contrasena=generarContrasena();
               var cadenaContrasena='<strong>Contraseña: </strong>';
               cadenaContrasena=cadenaContrasena+contrasena;
-              var nodeM=nodemailer.createTransport("smtps://karyto743@gmail.com:743rya347@smtp.gmail.com");
+              var nodeM=nodemailer.createTransport("smtps://karyto743@gmail.com:743ryj347@smtp.gmail.com");
               var mailOpciones={
                 from:"karyto743@gmail.com",
                 to:email, 
