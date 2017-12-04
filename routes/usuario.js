@@ -213,6 +213,7 @@ router.put('/modificarUsuario', function(solicitud, respuesta, next) {
 //Finalmente envia un gmail (con la informacion email, celular, link_Facebook) al usuario que se puso en contacto con el usuario que emitio el anuncio 
 router.post('/verUsuario', function(solicitud, respuesta, next) { 
   //Rol_Usuario.borrado_Logico=?
+  var comentario="";
   var verUsuario=db.query("SELECT Usuario.nombres,Usuario.cedula,Usuario.foto,Usuario.email,Usuario.celular,Usuario.link_Facebook,Usuario.id_Usuario from Usuario, Publicacion WHERE Publicacion.id_Publicacion=? and Publicacion.id_Usuario=Usuario.id_Usuario",[solicitud.body.id_Publicacion],function(error,resBD,filas){
     if(error){
       console.log(error); 
@@ -229,7 +230,7 @@ router.post('/verUsuario', function(solicitud, respuesta, next) {
                 console.log(error);
               }else{ 
                 if(res==""){
-                  var ingresarCalificacion=db.query('INSERT INTO Calificacion(id_Publicacion,id_UsuarioP,id_UsuarioC,calif) VALUES(?,?,?,?)', [solicitud.body.id_Publicacion,resBD[0]['id_Usuario'],solicitud.body.id_UsuarioC,0],function(error,columnas,filas){
+                  var ingresarCalificacion=db.query('INSERT INTO Calificacion(id_Publicacion,id_UsuarioP,id_UsuarioC,calif,comentario,borrado_Logico) VALUES(?,?,?,?,?,?)', [solicitud.body.id_Publicacion,resBD[0]['id_Usuario'],solicitud.body.id_UsuarioC,0,comentario,0],function(error,columnas,filas){
                     if(error){
                       console.log(error);
                     }else{

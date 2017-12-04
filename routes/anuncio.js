@@ -78,7 +78,8 @@ router.post('/verificarCalificacion',function(solicitud,respuesta){
 //*********************************Modificar Calificación*************************************//
 //Actualiza a informacion de la calificacion 
 router.put('/modificarCalificar', function(solicitud, respuesta, next) {
-  var modificarUsuario=db.query('UPDATE Calificacion SET calif=? WHERE id_Publicacion=? and id_UsuarioP=? and id_UsuarioC=?', [solicitud.body.valorC,solicitud.body.id_Publicacion,solicitud.body.id_UsuarioP,solicitud.body.id_UsuarioC],function(error,resBD,filas){
+  console.log(solicitud.body);
+  var modificarUsuario=db.query('UPDATE Calificacion SET calif=?,comentario=? WHERE id_Publicacion=? and id_UsuarioP=? and id_UsuarioC=?', [solicitud.body.valorC,solicitud.body.comentario,solicitud.body.id_Publicacion,solicitud.body.id_UsuarioP,solicitud.body.id_UsuarioC],function(error,resBD,filas){
     if(error){
       console.log(error);
     }else{
@@ -98,18 +99,23 @@ router.put('/modificarCalificar', function(solicitud, respuesta, next) {
       }
     })
   });
-/*
-  router.post('/promedioCalificar', function(solicitud, respuesta, next) {
-    var promedioCalificacion=db.query('SELECT avg(calif) from Calificacion WHERE id_UsuarioP=?', [solicitud.body.id_UsuarioP],function(error,res,filas){
+  router.post('/listaComentarios', function(solicitud, respuesta, next) {
+    var listarComentarios=db.query('SELECT nombres,Usuario.foto,calif,comentario,Usuario.id_Usuario FROM Usuario, Calificacion, Publicacion where Calificacion.borrado_Logico=0 and Calificacion.id_Publicacion=? and Calificacion.id_UsuarioC=Usuario.id_Usuario and calif>0 and Calificacion.id_Publicacion=Publicacion.id_Publicacion and Publicacion.id_Usuario!=Calificacion.id_UsuarioC',[solicitud.body.id_Publicacion],function(error,res,filas){
       if(error){
         console.log(error);
       }else{
+        var f;
+        for (var i = 0; i < res.length; i++) {
+          f=res[i].foto;      
+          res[i].foto=f.toString();
+          //console.log(res[i].foto);
+        };
         respuesta.json(res);
       }
     })
   });
 
-*/
+
 return router;
 }
 
