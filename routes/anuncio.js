@@ -65,7 +65,7 @@ router.post('/verificarCalificacion',function(solicitud,respuesta){
     if(error){
       console.log(error); 
     }else{ 
-      var verificarUsuario=db.query("SELECT *FROM Calificacion WHERE id_Publicacion=? and id_UsuarioP=? and id_UsuarioC=?",[solicitud.body.id_Publicacion,resBD[0]['id_Usuario'],solicitud.body.id_UsuarioC],function(error,res,filas){
+      var verificarUsuario=db.query("SELECT *FROM Calificacion WHERE id_Publicacion=? and id_UsuarioP=? and id_UsuarioC=? and borrado_Logico=0",[solicitud.body.id_Publicacion,resBD[0]['id_Usuario'],solicitud.body.id_UsuarioC],function(error,res,filas){
         if(error){
           console.log(error);
         }else{ 
@@ -91,7 +91,7 @@ router.put('/modificarCalificar', function(solicitud, respuesta, next) {
 //Con avg se saca el promedio de todas las calificaciones que tiene un usuario
   router.post('/promedioCalificar', function(solicitud, respuesta, next) {
    // console.log(solicitud.body.id_UsuarioP);
-    var promedioCalificacion=db.query('SELECT avg(calif) from Calificacion WHERE id_UsuarioP=? and calif>?',[solicitud.body.id_UsuarioP,0],function(error,res,filas){
+    var promedioCalificacion=db.query('SELECT avg(calif) from Calificacion WHERE id_UsuarioP=? and calif>? and borrado_Logico=0',[solicitud.body.id_UsuarioP,0],function(error,res,filas){
       if(error){
         console.log(error);
       }else{

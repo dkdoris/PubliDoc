@@ -1,7 +1,38 @@
-module.exports=function(db){
+module.exports=function(db,request){
 var express = require('express');
 var router = express.Router();
-
+var sendNotificationToUser=function(token,message) {
+  var API_KEY = "AAAAOeSNvEc:APA91bGxlzowRwF_NFbDg7vmQGfltqC24VcRF1gcunfx0YOjx0tZdcRzTXNM_67Z3PKM6UDcV8D059j25COi1VFLoYe-zIRUhhlQ7kkwrmgwZWJReDWzr6AhEJSUu6lcyZlqQ861Rc82"; // Your Firebase Cloud Server API key
+  request({
+    url: 'https://fcm.googleapis.com/fcm/send',
+    method: 'POST',
+    headers: {
+      'Content-Type' :' application/json',
+      'Authorization': 'key='+API_KEY
+    },
+    body: JSON.stringify({
+      notification: {
+        title: "Documentos Extraviados",
+        icon:"p.png",
+        body:message
+      },
+      data:{
+        titulo: "Documentos Extraviados",
+        icono:"p.png",
+        cuerpo:message
+      },
+      "to" : token
+    })
+  }, function(error, response, body) {
+    if (error) { console.error(error); }
+    else if (response.statusCode >= 400) { 
+      console.error('HTTP Error: '+response.statusCode+' - '+response.statusMessage); 
+    }
+    else {
+      console.log("se envio");
+    }
+  });
+};
 router.post('/iniciarSesion', function(solicitud, respuesta, next) {
    //   console.log(solicitud.body);  
       var iniciarsession=db.query("SELECT *FROM Usuario, Rol_Usuario WHERE cedula=? and contrasena=? and (id_Rol=? or id_Rol=?) and Rol_Usuario.id_Usuario=Usuario.id_Usuario",[solicitud.body.usuario,solicitud.body.contrasena,1,2],function(error,usuario){
@@ -74,12 +105,25 @@ router.get('/listaPublicacionesDenunciadas', function(solicitud, respuesta, next
               })       
 });
 router.put('/actualizarPublicacion', function(solicitud, respuesta, next) {   
-  //console.log(solicitud.body);         
   var consulta1=db.query('UPDATE Publicacion SET revision=?, razon=? WHERE id_Publicacion=?',[solicitud.body.variable,solicitud.body.razon,solicitud.body.id_Publicacion],function(error,resBD){
     if(error){
       console.log(error); 
-    }else{                     
-      respuesta.json("Publicacion");                                               
+    }else{ 
+      //poner if para saber si la variable es igual a dos  se envia la notificacion a ala publicacion 
+      if(solicitud.body.variable==1){
+        var seleccionarToken=db.query('SELECT token from Usuario WHERE cedula=? and id_Usuario!=?', [solicitud.body.cedula,solicitud.body.id_Usuario],function(error,resBD2,filas){
+          if(error){
+            console.log(error);
+          }else{
+            if(resBD2!=""){            
+              var mensaje="El número de cédula "+solicitud.body.cedula+ " se encuentra en un anuncio";
+              var t=resBD2[0]['token']+"";              
+              sendNotificationToUser(t,mensaje);
+             }
+          } 
+        })
+      }                      
+     respuesta.json("Publicacion");                                                
     }                            
   });
 });  
@@ -178,7 +222,13 @@ router.put('/inactivarDenuncia', function(solicitud, respuesta, next) {
                             if(error){
                             console.log(error);
                             }else{
-                              respuesta.json("usuario inactivo");   
+                              var darDeBajaCalificacion=db.query('UPDATE Calificacion SET borrado_Logico=? WHERE id_UsuarioP=? or id_UsuarioC', [-1,solicitud.body.id,solicitud.body.id],function(error,resM,filas){
+                                if(error){
+                                console.log(error);
+                                }else{                                  
+                                  respuesta.json("usuario inactivo");   
+                                }
+                              })                              
                             }
                           })
                         }
@@ -233,9 +283,15 @@ router.put('/inactivarPublicacion', function(solicitud, respuesta, next) {
         if(error){
           console.log(error);                  
           respuesta.json(1);  
-         }else{                      
-          respuesta.json("Publicacion inactiva");
-                      }
+         }else{  
+            var darDeBajaCalificacion=db.query('UPDATE Calificacion SET borrado_Logico=? WHERE id_Publicacion=?', [solicitud.body.id_Publicacion],function(error,resM,filas){
+              if(error){
+                console.log(error);
+              }else{                                  
+                respuesta.json("Publicacion inactiva");
+              }
+            })                               
+          }
         })                         
     }                            
   });
@@ -248,7 +304,6 @@ router.post('/cerrar_session', function(req, res, next) {
   //res.redirect(200,'../');
   res.json("1");
 });
-
 router.get('/verificarSesion', function(solicitud, respuesta, next) {
   //console.log("cerrar_session");
  // console.log(req.body.datos.nombres);
@@ -334,7 +389,6 @@ router.post('/crearUsuario', function(solicitud, respuesta, next) {
       }   
     };
   })
-
 });
 router.get('/obtener_TipoUsuario', function(solicitud, respuesta, next) {
   var obtener_TipoUsuario=db.query('SELECT *FROM Rol WHERE id_Rol!=1',function(error,res){

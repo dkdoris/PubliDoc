@@ -1,4 +1,4 @@
-module.exports=function(db,request){
+module.exports=function(db){
 var express = require('express'),
 path=require("path");
 var router = express.Router();
@@ -21,38 +21,6 @@ router.get('/mostrarDocumento', function(solicitud, respuesta, next) {
   
   })
 });
-var sendNotificationToUser=function(token,message) {
-  var API_KEY = "AAAAOeSNvEc:APA91bGxlzowRwF_NFbDg7vmQGfltqC24VcRF1gcunfx0YOjx0tZdcRzTXNM_67Z3PKM6UDcV8D059j25COi1VFLoYe-zIRUhhlQ7kkwrmgwZWJReDWzr6AhEJSUu6lcyZlqQ861Rc82"; // Your Firebase Cloud Server API key
-  request({
-    url: 'https://fcm.googleapis.com/fcm/send',
-    method: 'POST',
-    headers: {
-      'Content-Type' :' application/json',
-      'Authorization': 'key='+API_KEY
-    },
-    body: JSON.stringify({
-      notification: {
-        title: "Documentos Extraviados",
-        icon:"p.png",
-        body:message
-      },
-      data:{
-        titulo: "Documentos Extraviados",
-        icono:"p.png",
-        cuerpo:message
-      },
-      "to" : token
-    })
-  }, function(error, response, body) {
-    if (error) { console.error(error); }
-    else if (response.statusCode >= 400) { 
-      console.error('HTTP Error: '+response.statusCode+' - '+response.statusMessage); 
-    }
-    else {
-      console.log("se envio");
-    }
-  });
-};
 
 
 //*****************Crear Publicación de Encuentro*****************//
@@ -93,7 +61,7 @@ router.post('/crearPublicacionE', function(solicitud, respuesta, next) {
                         })
                       }            
                     };                
-                    var seleccionarToken=db.query('SELECT token from Usuario WHERE cedula=? and id_Usuario!=?', [solicitud.body.numero_Documento, solicitud.body.id_Usuario],function(error,resBD,filas){
+                    /*var seleccionarToken=db.query('SELECT token from Usuario WHERE cedula=? and id_Usuario!=?', [solicitud.body.numero_Documento, solicitud.body.id_Usuario],function(error,resBD,filas){
                               if(error){
                                 console.log(error);
                               }else{
@@ -103,7 +71,7 @@ router.post('/crearPublicacionE', function(solicitud, respuesta, next) {
                                   sendNotificationToUser(t,mensaje);
                                 }
                               } 
-                            })
+                            })*/
                 respuesta.json("1");
              }
 
@@ -144,7 +112,7 @@ router.post('/crearPublicacionP', function(solicitud, respuesta, next) {
               })
             }            
           }; 
-                  var seleccionarToken=db.query('SELECT token from Usuario WHERE cedula=? and id_Usuario!=?', [solicitud.body.numero_Documento,solicitud.body.id_Usuario],function(error,resBD,filas){
+                  /*var seleccionarToken=db.query('SELECT token from Usuario WHERE cedula=? and id_Usuario!=?', [solicitud.body.numero_Documento,solicitud.body.id_Usuario],function(error,resBD,filas){
                     if(error){
                       console.log(error);
                     }else{
@@ -156,7 +124,7 @@ router.post('/crearPublicacionP', function(solicitud, respuesta, next) {
                         sendNotificationToUser(t,mensaje);
                       }
                     } 
-                  })
+                  })*/
           respuesta.json("se creo correctamente la PUBLICACION Encuentro");   
     }
   })

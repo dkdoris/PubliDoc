@@ -45,9 +45,7 @@ app.factory("datosUser", function () {
     return {
         user: _user
     };
-
 })
-
 app.factory("validarCed", function () {
     return {
         validarCedul: function (id_ced) {
@@ -193,15 +191,15 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                     console.log('Error:' + data);
                 });        
     }
-    $scope.publicar=function(id_Publicacion,variable){
+    $scope.publicar=function(id_Publicacion,variable,cedula,id_Usuario){
         var razon="";
         if(variable==2){
             razon = prompt("¿Escriba la razon de porque esta publicación va a ser negada?", "");
             if (razon != null){
                 $http.put('/admin/actualizarPublicacion',{variable,id_Publicacion,razon})
                 .then(function(data) {              
-                            $scope.mensajeP="La publicación fue denegada";                        
-                    
+                    alert(data['data']);
+                    $scope.mensajeP="La publicación fue denegada";                        
                     $scope.listarPublicaciones();
                 })
                 .catch(function(data) {                
@@ -211,17 +209,17 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                 alert("Para realizar esta operación se debe ingresar la razón");
             }   
         }else{
-            $http.put('/admin/actualizarPublicacion',{variable,id_Publicacion,razon})
-                .then(function(data) {              
+            $http.put('/admin/actualizarPublicacion',{variable,id_Publicacion,razon,cedula,id_Usuario})
+                .then(function(data) {                                
                     $scope.mensajeP="La publicación fue aceptada";                        
+                    alert(data);  
                     $scope.listarPublicaciones();
                 })
-                .catch(function(data) {                
+                .catch(function(data) {                 
                     console.log('Error:' + data);
             });  
         }
-    }   
-    
+    }       
 })
 .controller('principalController',function($scope, $http,$state,datosUser){
     $scope.verificarSesion=function(){
@@ -262,6 +260,7 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
 .controller('gestion_usuariosController',function($scope, $http,$state,validarCed){  
     $scope.logContrasena = true;
     $scope.emailValido = true;
+    $scope.datosSoap = true;
         //Crea una fecha actual
     $scope.fechaActual = new Date();
     //Calcula la fecha limite a ser presentada
@@ -293,7 +292,6 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
             });
     }
     $scope.listarUser();
-
     $scope.desactivar=function(id,tipo){        
         $http.put('/admin/estado_usuario',{id,tipo})
             .then(function(data) {  
@@ -307,8 +305,7 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
             })
             .catch(function(data) {                
                 console.log('Error:' + data);
-            });            
-        
+            });                    
     }
     $scope.restaurarContrasena=function(id,cedula){
         $http.put('/admin/restaurar_contrasena',{id,cedula})
@@ -328,7 +325,6 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
         } else {
             $scope.logContrasena = false;
         }
-
     };
         //Verifica el formato ingresado en el campo del email para ver si esta correcto de lo contrario muestra un mensaje de error
     $scope.validarEmail = function () {
@@ -350,7 +346,6 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
 
             console.log('Error:' + data['data']);
         });
-
     }
     $scope.tipoInput = 'password';
     $scope.mostrarEsconderContrasena = function () {
@@ -381,9 +376,8 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
             reader.readAsDataURL(input.files[0]);
         }
     }
- 
     var fileUpload = document.getElementById('file-upload');
-    fileUpload.onchange = function (e) {
+        fileUpload.onchange = function (e) {
         readFile(e.srcElement);
     }     
     $scope.crearUsuario=function(){
@@ -412,7 +406,7 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
                 console.log('Error:' + data['data']);
             });
     };
-    $scope.validarCedula = function () {   
+    /*$scope.validarCedula = function () {   
         if($scope.usuario.cedula.length==10){
             if (validarCed.validarCedul($scope.usuario.cedula) == true) {
                 $scope.cedulaValida = true;
@@ -422,7 +416,41 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
         }else{
             $scope.cedulaValida=false;
         } 
-    }
+    }*/
+        $scope.validarCedula = function () {   
+        if ($scope.usuario.cedula.length == 10) {
+            $scope.usuario.cedula += "";
+            if (validarCed.validarCedul($scope.usuario.cedula) == true) {
+                $scope.cedulaValida = true;
+                $http.get('http://siaaf.unl.edu.ec:8091/api/v1/servicios_web/buscar-por-cedula-reg-civil/'+ $scope.usuario.cedula)                
+                .then(function(data) {  
+                                    //Guarda los nombres y apellidos del usuario que ingreso el número de cédula para presentarlos a la aplicaicon 
+                    if ((data["data"]["data"]["Error"] == "N.U.I. INCORRECTO.") || (data["data"]["data"]["CodigoError"] == "009")) {
+                        $scope.datosSoap = false;
+                    } else {
+                        $scope.datosSoap = true;
+                        $scope.nombres = data["data"]["data"]["Nombre"];
+                        $scope.edad = data["data"]["data"]["FechaNacimiento"];
+                        $scope.usuario.nombres = $scope.nombres;
+                        $scope.usuario.fecha_Nacimiento = $scope.edad;
+                    }                  
+                })
+                .catch(function(data) {  
+                    console.log('ERROR: ' + data['data']);
+                    $scope.nombres = '';
+                    $scope.edad = '';
+                });
+            } else{
+                $scope.nombres = '';
+                $scope.edad = '';
+                $scope.cedulaValida = false;
+            }
+        } else {
+            $scope.nombres = '';
+            $scope.edad = '';
+            $scope.cedulaValida = false;
+        }
+    };
 })
 .controller('denuncias_usuariosController',function($scope, $http,$state){
     $scope.mensajeDU="";

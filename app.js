@@ -63,9 +63,9 @@ app.use(session({secret: '123456', resave: true, saveUninitialized: true}));
 //ruteo es el cambio de URL
 app.use('/', routes);
 app.use('/users', users);
-app.use('/admin', admin(conecccion));
+app.use('/admin', admin(conecccion,request));
 app.use('/usuario', usuario(conecccion));
-app.use('/publicacion', publicacion(conecccion,request));
+app.use('/publicacion', publicacion(conecccion));
 app.use('/mensaje', mensaje(app.io,conecccion,request));
 app.use('/anuncio', anuncio(conecccion));
 

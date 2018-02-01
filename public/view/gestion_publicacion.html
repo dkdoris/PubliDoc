@@ -70,8 +70,8 @@
         <span> {{  datosPublicacion.detalles}}</span>
       </div>
       <div class="modal-footer">
-        <a class="btn btn-default" data-dismiss="modal" ng-click="publicar(datosPublicacion.id_Publicacion,1)">Publicar</a>
-        <a class="btn btn-default" data-dismiss="modal" ng-click="publicar(datosPublicacion.id_Publicacion,2)">Denegar</a>
+        <a class="btn btn-default" data-dismiss="modal" ng-click="publicar(datosPublicacion.id_Publicacion,1,datosPublicacion.numero_Documento,datosPublicacion.id_Usuario)">Publicar</a>
+        <a class="btn btn-default" data-dismiss="modal" ng-click="publicar(datosPublicacion.id_Publicacion,2,0,0)">Denegar</a>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
