@@ -280,7 +280,7 @@ router.post('/verUsuario', function(solicitud, respuesta, next) {
 
 //Algoritmo para generar la contraseña momentanea para recuperar la contraseña
 var generarContrasena=function(){
-  var n=(Math.random()*356757).toFixed(0);
+  var n=(Math.random()*356757999).toFixed(0);
   return n;
 };
 //***********************Recuperar Contraseña**************************//
