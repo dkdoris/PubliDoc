@@ -198,7 +198,7 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
             if (razon != null){
                 $http.put('/admin/actualizarPublicacion',{variable,id_Publicacion,razon})
                 .then(function(data) {              
-                    alert(data['data']);
+                  //  alert(data['data']);
                     $scope.mensajeP="La publicación fue denegada";                        
                     $scope.listarPublicaciones();
                 })
@@ -212,7 +212,7 @@ app.controller( 'gestion_publicaionController', function($scope, $http,$state) {
             $http.put('/admin/actualizarPublicacion',{variable,id_Publicacion,razon,cedula,id_Usuario})
                 .then(function(data) {                                
                     $scope.mensajeP="La publicación fue aceptada";                        
-                    alert(data);  
+                 //   alert(data);  
                     $scope.listarPublicaciones();
                 })
                 .catch(function(data) {                 
